@@ -1,0 +1,26 @@
+version: '3.4'
+
+services:
+  comments-app-db:
+    container_name: comments-app-db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    ports:
+      - "8082:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password@123
+
+  comments-app:
+    container_name: comments-app-server
+    build:
+      context: .
+      dockerfile: Comments-app/Dockerfile
+    ports: 
+      - "8080:80"
+      - "8081:81"
+    depends_on:
+      - comments-app-db
+    environment:
+      - DB_HOST=comments-app-db
+      - DB_NAME=CommentsApp
+      - DB_SA_PASSWORD=password@123

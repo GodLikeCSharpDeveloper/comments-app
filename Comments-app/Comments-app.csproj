@@ -7,6 +7,7 @@
     <RootNamespace>Comments_app</RootNamespace>
     <UserSecretsId>d44763bc-c1e9-44e5-aa5b-3e7f9cbffc3c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
   <ItemGroup>
