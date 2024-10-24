@@ -1,16 +1,47 @@
 using CommentApp.Common.Data;
+using CommentApp.Common.Kafka.Consumer;
+using CommentApp.Common.Kafka.TopicCreator;
+using CommentApp.Common.Repositories.CommentRepository;
+using CommentApp.Common.Repositories.UserRepository;
+using CommentApp.Common.Services.CommentService;
+using CommentApp.Common.Services.UserService;
+using Confluent.Kafka;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<CommentsAppContext>(options =>
+builder.Services.AddLogging(configure =>
+{
+    configure.AddConsole();
+    configure.SetMinimumLevel(LogLevel.Information);
+});
+builder.Services.AddDbContext<CommentsAppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+var bootstrapServers = builder.Configuration.GetSection("Kafka")["BootstrapServers"];
+builder.Services.AddSingleton(provider =>
+{
+    var config = new ConsumerConfig
+    {
+        BootstrapServers = bootstrapServers,
+        GroupId = "comment-consumers",
+        AutoOffsetReset = AutoOffsetReset.Earliest
+    };
+    return new ConsumerBuilder<Null, string>(config).Build();
+});
 
+builder.Services.AddSingleton<IKafkaTopicCreator>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<KafkaTopicCreator>>();
+    return new KafkaTopicCreator(bootstrapServers, logger);
+});
+builder.Services.AddSingleton<ICommentConsumer, CommentConsumer>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -22,8 +53,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppContext>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppDbContext>();
     dbContext.Database.Migrate();
 }
 app.Run();
+using (var scope = app.Services.CreateScope())
+{
+    var test = scope.ServiceProvider.GetRequiredService<ICommentConsumer>();
+    await test.StartConsumingAsync();
+}
 

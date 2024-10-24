@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CommentApp.Common.Data
 {
-    public class CommentsAppContext(DbContextOptions<CommentsAppContext> options) : DbContext(options)
+    public class CommentsAppDbContext(DbContextOptions<CommentsAppDbContext> options) : DbContext(options)
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Comment> Comments { get; set; }

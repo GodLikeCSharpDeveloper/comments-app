@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CommentsApp.Common.Migrations
 {
-    [DbContext(typeof(CommentsAppContext))]
+    [DbContext(typeof(CommentsAppDbContext))]
     [Migration("20241023173236_InitialCreate")]
     partial class InitialCreate
     {
