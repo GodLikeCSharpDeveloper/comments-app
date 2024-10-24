@@ -1,4 +1,4 @@
-using Comments_app.Common.Data;
+using CommentApp.Common.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -20,10 +20,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.Run();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppContext>();
     dbContext.Database.Migrate();
 }
+app.Run();
+

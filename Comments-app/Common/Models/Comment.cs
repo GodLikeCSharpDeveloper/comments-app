@@ -1,4 +1,4 @@
-﻿namespace Comments_app.Common.Models
+﻿namespace CommentApp.Common.Models
 {
     public class Comment(string text, string captcha)
     {

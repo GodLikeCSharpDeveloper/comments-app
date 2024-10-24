@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Comments_app.Common.Models
+namespace CommentApp.Common.Models
 {
     public class User(string userName, string email)
     {

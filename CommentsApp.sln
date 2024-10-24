@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Comments-app", "Comments-app\Comments-app.csproj", "{BE99C08E-7D46-4DF6-A227-381D51187124}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentApp", "Comments-app\CommentApp.csproj", "{BE99C08E-7D46-4DF6-A227-381D51187124}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C6D10045-D835-4344-80F2-1AF84F15B5C0}"
 EndProject

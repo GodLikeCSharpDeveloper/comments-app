@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>Comments_app</RootNamespace>
+    <RootNamespace>CommentApp</RootNamespace>
     <UserSecretsId>d44763bc-c1e9-44e5-aa5b-3e7f9cbffc3c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>

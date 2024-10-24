@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Comments_app.Common.Migrations
+namespace CommentsApp.Common.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

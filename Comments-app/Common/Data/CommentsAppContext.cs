@@ -1,7 +1,7 @@
-﻿using Comments_app.Common.Models;
+﻿using CommentApp.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Comments_app.Common.Data
+namespace CommentApp.Common.Data
 {
     public class CommentsAppContext(DbContextOptions<CommentsAppContext> options) : DbContext(options)
     {
