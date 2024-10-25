@@ -18,3 +18,6 @@
 /server/bin/Debug
 /server/obj/Debug
 /server/obj/Docker
+/LoadTester/obj/Debug
+/LoadTester/obj
+/LoadTester/bin

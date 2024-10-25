@@ -12,25 +12,19 @@ namespace LoadTester
 {
     class Program
     {
-        private static readonly int TotalRequests = 1000;
+        private static readonly int TotalRequests = 10000;
         private static readonly int ConcurrentRequests = 100;
-        private static readonly string Url = "http://localhost:8080/api/comments";
+        private static readonly string Url = "https://comments-app:8081/api/comments";
         static async Task Main(string[] args)
         {
             while (true)
             {
-                Console.WriteLine("Нажмите Enter для запуска нагрузочного теста или введите 'exit' для выхода.");
-                var input = Console.ReadLine();
-
-                if (input.Equals("exit", StringComparison.OrdinalIgnoreCase))
-                {
-                    break;
-                }
-
                 Console.WriteLine("Load test started...");
+
                 var handler = new HttpClientHandler
                 {
-                    MaxConnectionsPerServer = ConcurrentRequests
+                    MaxConnectionsPerServer = ConcurrentRequests,
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true // Отключаем проверку сертификатов
                 };
 
                 using var httpClient = new HttpClient(handler);
@@ -79,7 +73,7 @@ namespace LoadTester
                         }
                     });
 
-                    if (i % 10000 == 0)
+                    if (i % 100 == 0)
                     {
                         Console.WriteLine($"{i} requests sent...");
                     }
@@ -90,10 +84,8 @@ namespace LoadTester
                 Console.WriteLine("Load test finished.");
                 Console.WriteLine($"Successful requests: {successful}");
                 Console.WriteLine($"Failed requests: {failed}");
-                Console.WriteLine(); // Добавляем пустую строку для разделения выводов
+                Console.WriteLine();
             }
-
-            Console.WriteLine("Программа завершена.");
         }
     }
 }

@@ -9,6 +9,8 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=password@123
+    networks:
+      - shared-network 
 
   comments-app:
     container_name: comments-app-server
@@ -16,8 +18,8 @@ services:
       context: .
       dockerfile: Comments-app/Dockerfile
     ports: 
-      - "8080:80"
-      - "8081:81"
+      - "8080:8080"
+      - "8081:8081"
     depends_on:
       - comments-app-db
       - kafka
@@ -26,21 +28,38 @@ services:
       - DB_NAME=CommentsApp
       - DB_SA_PASSWORD=password@123
       - KAFKA_HOST=kafka:9092
-      - ASPNETCORE_URLS=http://0.0.0.0:80
+
+    networks:
+      - shared-network 
+
   zookeeper:
     image: bitnami/zookeeper:latest
     ports:
       - "2181:2181"
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - shared-network
 
   kafka:
     image: bitnami/kafka:latest
     ports:
       - "9092:9092"
+      - "7071:7071"
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_OPTS=-javaagent:/Comments-app/jmx_prometheus_javaagent-1.0.1.jar=7071:/Comments-app/kafka_jmx_config.yml
+    volumes:
+      - ./Comments-app/jmx_prometheus_javaagent-1.0.1.jar:/Comments-app/jmx_prometheus_javaagent-1.0.1.jar
+      - ./Comments-app/kafka_jmx_config.yml:/Comments-app/kafka_jmx_config.yml
+    networks:
+      - shared-network 
+
+networks:
+  shared-network:
+    name: shared-network
+    external: false

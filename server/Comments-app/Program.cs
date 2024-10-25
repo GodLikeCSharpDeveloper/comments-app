@@ -49,6 +49,21 @@ builder.Services.AddSingleton<IProducer<Null, string>>(provider =>
     };
     return new ProducerBuilder<Null, string>(config).Build();
 });
+builder.Services.AddHttpClient("ClientName", client =>
+{
+    client.BaseAddress = new Uri("https://comments-app:8081");
+})
+.ConfigurePrimaryHttpMessageHandler(() =>
+    new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, chain, sslPolicyErrors) =>
+        {
+            // Отключаем проверку имени сертификата
+            return sslPolicyErrors == System.Net.Security.SslPolicyErrors.RemoteCertificateNameMismatch ||
+                   sslPolicyErrors == System.Net.Security.SslPolicyErrors.RemoteCertificateChainErrors
+                   ? true : sslPolicyErrors == System.Net.Security.SslPolicyErrors.None;
+        }
+    });
 
 builder.Services.AddSingleton<ICommentConsumer, CommentConsumer>();
 var app = builder.Build();
