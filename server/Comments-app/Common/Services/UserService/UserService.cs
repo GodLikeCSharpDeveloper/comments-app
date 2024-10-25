@@ -14,7 +14,7 @@ namespace CommentApp.Common.Services.UserService
 
         public async Task CreateUserAsync(string userName, string email, string? homePage)
         {
-            var user = new User(userName, email) { HomePage = homePage };
+            var user = new User { UserName = userName, Email = email, HomePage = homePage };
             await userRepository.AddUserAsync(user);
             await userRepository.SaveChangesAsync();
         }

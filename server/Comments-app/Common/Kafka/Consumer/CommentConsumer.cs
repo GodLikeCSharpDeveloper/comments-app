@@ -14,12 +14,12 @@ namespace CommentApp.Common.Kafka.Consumer
 {
     public class CommentConsumer(IConsumer<Null, string> consumer,
         ILogger<CommentConsumer> logger,
-        IServiceProvider serviceProvider,
+        IServiceScopeFactory serviceScopeFactory,
         IKafkaTopicCreator kafkaTopicCreator) : ICommentConsumer
     {
         private readonly IConsumer<Null, string> consumer = consumer;
         private readonly ILogger<CommentConsumer> logger = logger;
-        private readonly IServiceProvider serviceProvider = serviceProvider;
+        private readonly IServiceScopeFactory serviceScopeFactory = serviceScopeFactory;
         private readonly IKafkaTopicCreator kafkaTopicCreator = kafkaTopicCreator;
         private CancellationTokenSource? cts;
 
@@ -30,7 +30,7 @@ namespace CommentApp.Common.Kafka.Consumer
             var replicationFactor = (short)1;
             await kafkaTopicCreator.CreateTopicAsync(topicName, numPartitions, replicationFactor);
             cts = new CancellationTokenSource();
-            _ = ConsumeComment(cts.Token);
+            _ = Task.Run(() => ConsumeComment(cts.Token));
         }
 
         public void StopConsuming()
@@ -54,11 +54,12 @@ namespace CommentApp.Common.Kafka.Consumer
                     var messageValue = consumeResult.Message.Value;
                     var comment = JsonConvert.DeserializeObject<Comment>(messageValue);
                     if (comment == null) throw new ArgumentException($"Comment can't be processed: {comment}");
-                    using (var scope = serviceProvider.CreateScope())
-                    {
-                        var commentService = scope.ServiceProvider.GetRequiredService<ICommentService>();
-                        await commentService.CreateCommentAsync(comment);
-                    }
+                    //using (var scope = serviceScopeFactory.CreateScope())
+                    //{
+                    //    var commentService = scope.ServiceProvider.GetRequiredService<ICommentService>();
+                    //    await commentService.CreateCommentAsync(comment);
+                    //}
+                    consumer.Commit(consumeResult);
                     logger.LogInformation($"Comment with ID {comment?.Id} processed.");
                 }
             }

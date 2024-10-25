@@ -10,13 +10,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddLogging(configure =>
 {
     configure.AddConsole();
-    configure.SetMinimumLevel(LogLevel.Information);
+    configure.SetMinimumLevel(LogLevel.Error);
 });
 builder.Services.AddDbContext<CommentsAppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -41,6 +41,15 @@ builder.Services.AddSingleton<IKafkaTopicCreator>(sp =>
     var logger = sp.GetRequiredService<ILogger<KafkaTopicCreator>>();
     return new KafkaTopicCreator(bootstrapServers, logger);
 });
+builder.Services.AddSingleton<IProducer<Null, string>>(provider =>
+{
+    var config = new ProducerConfig
+    {
+        BootstrapServers = bootstrapServers
+    };
+    return new ProducerBuilder<Null, string>(config).Build();
+});
+
 builder.Services.AddSingleton<ICommentConsumer, CommentConsumer>();
 var app = builder.Build();
 
@@ -56,10 +65,11 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppDbContext>();
     dbContext.Database.Migrate();
 }
-app.Run();
 using (var scope = app.Services.CreateScope())
 {
-    var test = scope.ServiceProvider.GetRequiredService<ICommentConsumer>();
-    await test.StartConsumingAsync();
+    var consumer = scope.ServiceProvider.GetRequiredService<ICommentConsumer>();
+    await consumer.StartConsumingAsync();
 }
+app.MapControllers();
+app.Run();
 

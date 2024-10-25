@@ -10,3 +10,11 @@
 /Comments-app/obj
 /obj
 /bin
+/LoadTester/.vs
+/LoadTester/LoadTester/obj
+/LoadTester/LoadTester/bin
+/server/obj/Docker/comments-app/*.cache
+*.cache
+/server/bin/Debug
+/server/obj/Debug
+/server/obj/Docker

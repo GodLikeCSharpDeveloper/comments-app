@@ -2,15 +2,15 @@
 
 namespace CommentApp.Common.Models
 {
-    public class User(string userName, string email)
+    public class User
     {
         public int Id { get; set; }
         [Required]
         [MaxLength(50)]
-        public string UserName { get; set; } = userName;
+        public string UserName { get; set; }
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = email;
+        public string Email { get; set; }
         public string? HomePage { get; set; }
         public ICollection<Comment> Comments { get; set; } = [];
     }
