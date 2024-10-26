@@ -1,5 +1,5 @@
-﻿using Confluent.Kafka.Admin;
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using Confluent.Kafka.Admin;
 
 namespace CommentApp.Common.Kafka.TopicCreator
 {

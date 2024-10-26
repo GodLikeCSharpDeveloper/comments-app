@@ -17,5 +17,10 @@ namespace CommentApp.Common.Services.CommentService
             await commentRepository.AddCommentAsync(comment);
             await commentRepository.SaveChangesAsync();
         }
+        public async Task CreateCommentBatchAsync(List<Comment> comments)
+        {
+            await commentRepository.CreateCommentBatchAsync(comments);
+            await commentRepository.SaveChangesAsync();
+        }
     }
 }

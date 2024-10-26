@@ -1,7 +1,4 @@
 ﻿using CommentApp.Common.Kafka.Consumer;
-using Microsoft.Extensions.Hosting;
-using System.Threading;
-using System.Threading.Tasks;
 
 public class KafkaConsumerHostedService(ICommentConsumer commentConsumer) : IHostedService
 {

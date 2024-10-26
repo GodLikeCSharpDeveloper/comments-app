@@ -1,10 +1,9 @@
-﻿using Confluent.Kafka;
+﻿using CommentApp.Common.Models;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using CommentApp.Common.Models;
 
-namespace CommentApp.Controllers
+namespace CommentApp.Common.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -25,7 +24,7 @@ namespace CommentApp.Controllers
             {
                 var commentJson = JsonConvert.SerializeObject(comment);
                 await kafkaProducer.ProduceAsync("comments-new", new Message<Null, string> { Value = commentJson });
-                logger.LogInformation("Comment successfully sent to Kafka: {@Comment}", comment);
+                //logger.LogInformation("Comment successfully sent to Kafka: {@Comment}", comment);
                 return Ok(new { Message = "Comment successfully sent to Kafka." });
             }
             catch (Exception ex)

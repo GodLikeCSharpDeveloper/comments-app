@@ -10,6 +10,7 @@ services:
     tty: true
     depends_on:
       - prometheus
+      - grafana
     networks:
       - shared-network
 
@@ -23,7 +24,24 @@ services:
     networks:
       - shared-network
 
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000" 
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+    networks:
+      - shared-network
+    volumes:
+      - grafana-data:/var/lib/grafana
+
 networks:
   shared-network:
     name: shared-network
     external: false
+
+volumes:
+  grafana-data:

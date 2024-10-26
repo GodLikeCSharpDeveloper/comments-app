@@ -1,32 +1,24 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using CommentApp.Common.Kafka.TopicCreator;
 using Confluent.Kafka;
-using Newtonsoft.Json;
-using Microsoft.Extensions.Logging;
-using CommentApp.Common.Models;
-using static Confluent.Kafka.ConfigPropertyNames;
-using Microsoft.Extensions.DependencyInjection;
-using CommentApp.Common.Kafka.TopicCreator;
-using CommentApp.Common.Services.CommentService;
+using StackExchange.Redis;
 
 namespace CommentApp.Common.Kafka.Consumer
 {
     public class CommentConsumer(IConsumer<Null, string> consumer,
         ILogger<CommentConsumer> logger,
-        IServiceScopeFactory serviceScopeFactory,
-        IKafkaTopicCreator kafkaTopicCreator) : ICommentConsumer
+        IKafkaTopicCreator kafkaTopicCreator,
+        IDatabase redisDatabase) : BackgroundService
     {
         private readonly IConsumer<Null, string> consumer = consumer;
         private readonly ILogger<CommentConsumer> logger = logger;
-        private readonly IServiceScopeFactory serviceScopeFactory = serviceScopeFactory;
         private readonly IKafkaTopicCreator kafkaTopicCreator = kafkaTopicCreator;
+        private readonly IDatabase redisDatabase = redisDatabase;
+        private const string RedisQueueKey = "comment_queue";
         private CancellationTokenSource? cts;
-
-        public async Task StartConsumingAsync()
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var topicName = "comments-new";
-            var numPartitions = 3;
+            var numPartitions = 7;
             var replicationFactor = (short)1;
             await kafkaTopicCreator.CreateTopicAsync(topicName, numPartitions, replicationFactor);
             cts = new CancellationTokenSource();
@@ -52,15 +44,16 @@ namespace CommentApp.Common.Kafka.Consumer
                 {
                     var consumeResult = consumer.Consume(cancellationToken);
                     var messageValue = consumeResult.Message.Value;
-                    var comment = JsonConvert.DeserializeObject<Comment>(messageValue);
-                    if (comment == null) throw new ArgumentException($"Comment can't be processed: {comment}");
-                    //using (var scope = serviceScopeFactory.CreateScope())
-                    //{
-                    //    var commentService = scope.ServiceProvider.GetRequiredService<ICommentService>();
-                    //    await commentService.CreateCommentAsync(comment);
-                    //}
-                    consumer.Commit(consumeResult);
-                    logger.LogInformation($"Comment with ID {comment?.Id} processed.");
+                    if (string.IsNullOrEmpty(messageValue)) throw new ArgumentException($"Comment can't be processed: {messageValue}");
+                    bool enqueued = await redisDatabase.ListRightPushAsync(RedisQueueKey, messageValue) > 0;
+                    if (enqueued)
+                    {
+                        consumer.Commit(consumeResult);
+                        logger.LogInformation($"Enqueued comment message: {consumeResult.Message.Key}");
+                    }
+                    else
+                        logger.LogWarning("Failed to enqueue message to Redis.");
+
                 }
             }
             catch (OperationCanceledException)

@@ -11,7 +11,7 @@ services:
       - SA_PASSWORD=password@123
     networks:
       - shared-network 
-
+    restart: always
   comments-app:
     container_name: comments-app-server
     build:
@@ -23,6 +23,7 @@ services:
     depends_on:
       - comments-app-db
       - kafka
+      - redis
     environment:
       - DB_HOST=comments-app-db
       - DB_NAME=CommentsApp
@@ -33,6 +34,7 @@ services:
       - shared-network 
 
   zookeeper:
+    container_name: zookeer
     image: bitnami/zookeeper:latest
     ports:
       - "2181:2181"
@@ -40,8 +42,9 @@ services:
       - ALLOW_ANONYMOUS_LOGIN=yes
     networks:
       - shared-network
-
+    restart: always
   kafka:
+    container_name: kafka
     image: bitnami/kafka:latest
     ports:
       - "9092:9092"
@@ -52,14 +55,29 @@ services:
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_OPTS=-javaagent:/Comments-app/jmx_prometheus_javaagent-1.0.1.jar=7071:/Comments-app/kafka_jmx_config.yml
+      - KAFKA_OPTS=-javaagent:/usr/bin/jmx_prometheus_javaagent-0.20.0.jar=7071:/etc/kafka/kafka_jmx_config.yml
+      - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=prod-kafka-001 -Djava.net.preferIPv4Stack=true
     volumes:
-      - ./Comments-app/jmx_prometheus_javaagent-1.0.1.jar:/Comments-app/jmx_prometheus_javaagent-1.0.1.jar
-      - ./Comments-app/kafka_jmx_config.yml:/Comments-app/kafka_jmx_config.yml
+      - ./jmx_prometheus_javaagent-0.20.0.jar:/usr/bin/jmx_prometheus_javaagent-0.20.0.jar
+      - ./kafka_jmx_config.yml:/etc/kafka/kafka_jmx_config.yml
     networks:
-      - shared-network 
+      - shared-network
+    restart: always
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - shared-network
+    restart: always
 
 networks:
   shared-network:
     name: shared-network
     external: false
+volumes:
+  redis-data:
+    driver: local

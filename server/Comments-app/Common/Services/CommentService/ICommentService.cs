@@ -6,5 +6,6 @@ namespace CommentApp.Common.Services.CommentService
     {
         Task<Comment?> GetCommentByIdAsync(int id);
         Task CreateCommentAsync(Comment comment);
+        Task CreateCommentBatchAsync(List<Comment> comments);
     }
 }

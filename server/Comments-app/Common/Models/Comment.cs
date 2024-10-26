@@ -7,7 +7,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public string Captcha { get; set; }
         public string? FilePath { get; set; }
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
         public User? User { get; set; }
         public int? ParentCommentId { get; set; }
         public Comment? ParentComment { get; set; }
