@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -123,7 +123,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "rate(process_cpu_seconds_total{job=\"kafka\"}[1m])",
@@ -142,7 +142,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -240,7 +240,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "sum without(area)(jvm_memory_bytes_used{job=\"kafka\"})",
@@ -259,7 +259,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -357,7 +357,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "sum without(gc)(rate(jvm_gc_collection_seconds_sum{job=\"kafka\"}[5m]))",
@@ -376,7 +376,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -458,7 +458,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "sum without(instance)(rate(\r\nkafka_server_BrokerTopicMetrics_MessagesIn_total{job=\"kafka\",topic!=\"\"}[5m]))",
@@ -477,7 +477,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -559,7 +559,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "sum without(instance)(rate(kafka_server_BrokerTopicMetrics_BytesIn_total{job=\"kafka\",topic!=\"\"}[5m]))",
@@ -578,7 +578,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "http://prometheus:9090"
+        "uid": "fe20y67q7im80d"
       },
       "fieldConfig": {
         "defaults": {
@@ -660,7 +660,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "http://prometheus:9090"
+            "uid": "fe20y67q7im80d"
           },
           "editorMode": "code",
           "expr": "sum without(instance)(rate(kafka_server_BrokerTopicMetrics_BytesOut_total{job=\"kafka\",topic!=\"\"}[5m]))",
