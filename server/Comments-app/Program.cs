@@ -27,6 +27,10 @@ builder.Services.AddBackgroundServiceOptions(builder.Configuration);
 
 builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 
+builder.Services.AddAmazonS3(builder.Configuration);
+
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

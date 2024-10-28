@@ -1,4 +1,7 @@
-﻿using CommentApp.Common.Data;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
+using CommentApp.Common.Data;
 using CommentApp.Common.Kafka.Consumer;
 using CommentApp.Common.Kafka.TopicCreator;
 using CommentApp.Common.Models.Options;
@@ -6,9 +9,12 @@ using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
 using CommentApp.Common.Services.CommentService;
+using CommentApp.Common.Services.FileService;
 using CommentApp.Common.Services.UserService;
 using Confluent.Kafka;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace CommentApp.Common.Extensions
@@ -26,6 +32,7 @@ namespace CommentApp.Common.Extensions
         {
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFileService, AmazonS3FileService>();
             return services;
         }
 
@@ -45,6 +52,20 @@ namespace CommentApp.Common.Extensions
             services.AddSingleton<IConnectionMultiplexer>(redis);
             services.AddSingleton(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
 
+            return services;
+        }
+        public static IServiceCollection AddAmazonS3(this IServiceCollection services, IConfiguration configuration)
+        {
+            var awsOptions = configuration.GetSection("S3AWS").Get<S3AWSOptions>();
+            services.AddSingleton<IAmazonS3>(provider =>
+            {
+                var awsCredentials = new BasicAWSCredentials(awsOptions.AccessKey, awsOptions.SecretKey);
+                var config = new AmazonS3Config
+                {
+                    RegionEndpoint = RegionEndpoint.GetBySystemName(awsOptions.Region)
+                };
+                return new AmazonS3Client(awsCredentials, config);
+            });
             return services;
         }
 
