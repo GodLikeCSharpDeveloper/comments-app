@@ -14,21 +14,15 @@ namespace CommentApp.Common.Kafka.Consumer
         private readonly IKafkaTopicCreator kafkaTopicCreator = kafkaTopicCreator;
         private readonly IDatabase redisDatabase = redisDatabase;
         private const string RedisQueueKey = "comment_queue";
-        private CancellationTokenSource? cts;
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await kafkaTopicCreator.CreateTopicAsync();
-            cts = new CancellationTokenSource();
-            _ = Task.Run(() => ConsumeComment(cts.Token), stoppingToken);
+            await ConsumeComment(stoppingToken);
         }
 
         public void StopConsuming()
         {
-            if (cts != null)
-            {
-                cts.Cancel();
-                consumer.Close();
-            }
+            consumer.Close();
         }
 
         private async Task ConsumeComment(CancellationToken cancellationToken)

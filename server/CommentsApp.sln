@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommentApp", "Comments-app\
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C6D10045-D835-4344-80F2-1AF84F15B5C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentsAppTests", "..\CommentsAppTests\CommentsAppTests.csproj", "{3E86C6C0-22B0-4A81-B770-71F9D3C75698}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C6D10045-D835-4344-80F2-1AF84F15B5C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6D10045-D835-4344-80F2-1AF84F15B5C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6D10045-D835-4344-80F2-1AF84F15B5C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E86C6C0-22B0-4A81-B770-71F9D3C75698}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E86C6C0-22B0-4A81-B770-71F9D3C75698}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E86C6C0-22B0-4A81-B770-71F9D3C75698}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E86C6C0-22B0-4A81-B770-71F9D3C75698}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

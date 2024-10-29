@@ -161,6 +161,7 @@ namespace CommentApp.Common.Extensions
         {
             services.AddHostedService<RedisToDbBackgroundService>();
             services.AddHostedService<CommentConsumer>();
+            services.AddHostedService<KafkaQueueService>();
             return services;
         }
 

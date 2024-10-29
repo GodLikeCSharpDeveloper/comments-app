@@ -21,3 +21,14 @@
 /LoadTester/obj/Debug
 /LoadTester/obj
 /LoadTester/bin
+/CommentsAppTests/bin
+/CommentsAppTests/obj
+bin
+obj
+/server/packages/MSTest.TestAdapter.2.2.10/build/_common/tr/*.dll
+*.dll
+*.XML
+*._
+*.props
+*.targets
+packages
