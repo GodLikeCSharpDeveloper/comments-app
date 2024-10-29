@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.405.4" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.7.400.41" />
     <PackageReference Include="Confluent.Kafka" Version="2.6.0" />
     <PackageReference Include="EFCore.BulkExtensions" Version="8.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.5" />

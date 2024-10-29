@@ -1,6 +1,7 @@
 using CommentApp.Common.Data;
 using CommentApp.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ builder.Services.AddBackgroundServiceOptions(builder.Configuration);
 
 builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 
-builder.Services.AddAmazonS3(builder.Configuration);
+await builder.Services.AddAmazonS3(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
@@ -40,7 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("AllowSpecificOrigin");
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppDbContext>();

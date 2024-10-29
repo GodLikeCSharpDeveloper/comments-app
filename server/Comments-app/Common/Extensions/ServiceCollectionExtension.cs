@@ -10,6 +10,7 @@ using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
+using CommentApp.Common.Services.SecretService;
 using CommentApp.Common.Services.UserService;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
@@ -54,7 +55,7 @@ namespace CommentApp.Common.Extensions
 
             return services;
         }
-        public static IServiceCollection AddAmazonS3(this IServiceCollection services, IConfiguration configuration)
+        public static async Task<IServiceCollection> AddAmazonS3(this IServiceCollection services, IConfiguration configuration)
         {
             var awsOptions = configuration.GetSection("S3AWS").Get<S3AWSOptions>();
             services.AddSingleton<IAmazonS3>(provider =>
@@ -144,7 +145,15 @@ namespace CommentApp.Common.Extensions
                     },
                     MaxConnectionsPerServer = httpClientOptions.MaxConnectionsPerServer,
                 });
-
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder
+                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials());
+            });
             return services;
         }
 

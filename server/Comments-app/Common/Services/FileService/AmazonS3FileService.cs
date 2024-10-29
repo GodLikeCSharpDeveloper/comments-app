@@ -12,7 +12,7 @@ namespace CommentApp.Common.Services.FileService
             if (file == null)
                 return string.Empty;
             using var fileStream = file.OpenReadStream();
-            var key = Guid.NewGuid().ToString();
+            var key = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
             var putRequest = new PutObjectRequest
             {
                 BucketName = bucketName,

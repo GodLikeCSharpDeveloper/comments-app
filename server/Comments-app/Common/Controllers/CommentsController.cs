@@ -18,21 +18,20 @@ namespace CommentApp.Common.Controllers
         private readonly IFileService fileService = fileService;
 
         [HttpPost]
-        public async Task<IActionResult> PostComment([FromBody] CommentDto commentDto, IFormFile? textFile, IFormFile? image)
+        public async Task<IActionResult> PostComment([FromForm] CreateCommentDto request)
         {
             if (!ModelState.IsValid)
             {
-                logger.LogWarning("Invalid model state for Comment: {@Comment}", commentDto);
+                logger.LogWarning("Invalid model state for Comment: {@Comment}", request);
                 return BadRequest(ModelState);
             }
             try
             {
-                var comment = mapper.Map<Comment>(commentDto);
-                comment.ImageUrl = await fileService.UploadFileAsync(image);
-                comment.TextFileUrl = await fileService.UploadFileAsync(textFile);
+                var comment = mapper.Map<Comment>(request);
+                comment.ImageUrl = await fileService.UploadFileAsync(request.Image);
+                comment.TextFileUrl = await fileService.UploadFileAsync(request.TextFile);
                 var commentJson = JsonConvert.SerializeObject(comment);
                 await kafkaProducer.ProduceAsync("comments-new", new Message<Null, string> { Value = commentJson });
-                //logger.LogInformation("Comment successfully sent to Kafka: {@Comment}", comment);
                 return Ok();
             }
             catch (Exception ex)

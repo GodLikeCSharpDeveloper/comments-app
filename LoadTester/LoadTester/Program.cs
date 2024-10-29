@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -14,7 +15,8 @@ namespace LoadTester
         public int Id { get; set; }
         public string Text { get; set; }
         public string Captcha { get; set; }
-        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
     }
 
     class Program
@@ -61,7 +63,8 @@ namespace LoadTester
                             {
                                 Text = new string('A', 500),
                                 Captcha = new string('B', 10),
-                                UserId = 1
+                                UserName = new string('C', 20),
+                                Email = $"test{i}@mail.com"
                             };
 
                             var json = JsonSerializer.Serialize(comment);

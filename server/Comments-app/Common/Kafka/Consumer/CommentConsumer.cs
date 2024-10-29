@@ -19,7 +19,7 @@ namespace CommentApp.Common.Kafka.Consumer
         {
             await kafkaTopicCreator.CreateTopicAsync();
             cts = new CancellationTokenSource();
-            _ = Task.Run(() => ConsumeComment(cts.Token));
+            _ = Task.Run(() => ConsumeComment(cts.Token), stoppingToken);
         }
 
         public void StopConsuming()
