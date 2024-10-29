@@ -1,7 +1,9 @@
-﻿namespace CommentApp.Common.Kafka.TopicCreator
+﻿using CommentApp.Common.Models.Options;
+
+namespace CommentApp.Common.Kafka.TopicCreator
 {
     public interface IKafkaTopicCreator
     {
-        public Task CreateTopicAsync(string topicName, int numPartitions, short replicationFactor);
+        public Task CreateTopicAsync();
     }
 }

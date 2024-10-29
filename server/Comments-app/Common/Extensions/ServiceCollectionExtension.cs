@@ -86,11 +86,11 @@ namespace CommentApp.Common.Extensions
             {
                 return new ConsumerBuilder<Null, string>(consumerConfig).Build();
             });
-
+            var topicOptions = configuration.GetSection("Topics").Get<List<TopicOptions>>();
             services.AddSingleton<IKafkaTopicCreator>(sp =>
             {
                 var logger = sp.GetRequiredService<ILogger<KafkaTopicCreator>>();
-                return new KafkaTopicCreator(bootstrapServers, logger);
+                return new KafkaTopicCreator(bootstrapServers, logger, topicOptions);
             });
             var producerConfig = new ProducerConfig
             {

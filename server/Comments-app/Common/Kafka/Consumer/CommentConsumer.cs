@@ -17,11 +17,7 @@ namespace CommentApp.Common.Kafka.Consumer
         private CancellationTokenSource? cts;
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //TODO move to config
-            var topicName = "comments-new";
-            var numPartitions = 7;
-            var replicationFactor = (short)1;
-            await kafkaTopicCreator.CreateTopicAsync(topicName, numPartitions, replicationFactor);
+            await kafkaTopicCreator.CreateTopicAsync();
             cts = new CancellationTokenSource();
             _ = Task.Run(() => ConsumeComment(cts.Token));
         }

@@ -1,40 +1,46 @@
-﻿using Confluent.Kafka;
+﻿using CommentApp.Common.Models.Options;
+using Confluent.Kafka;
 using Confluent.Kafka.Admin;
 
 namespace CommentApp.Common.Kafka.TopicCreator
 {
-    public class KafkaTopicCreator(string bootstrapServers, ILogger<KafkaTopicCreator> logger) : IKafkaTopicCreator
+    public class KafkaTopicCreator(string bootstrapServers,
+        ILogger<KafkaTopicCreator> logger,
+        List<TopicOptions> options) : IKafkaTopicCreator
     {
         private readonly string bootstrapServers = bootstrapServers;
         private readonly ILogger<KafkaTopicCreator> logger = logger;
-        public async Task CreateTopicAsync(string topicName, int numPartitions, short replicationFactor)
+        private readonly List<TopicOptions> options = options;
+        public async Task CreateTopicAsync()
         {
             var config = new AdminClientConfig { BootstrapServers = bootstrapServers };
 
             using var adminClient = new AdminClientBuilder(config).Build();
-
-            var topicSpecification = new TopicSpecification
+            foreach (var topic in options)
             {
-                Name = topicName,
-                NumPartitions = numPartitions,
-                ReplicationFactor = replicationFactor
-            };
-
-            try
-            {
-                await adminClient.CreateTopicsAsync(new[] { topicSpecification });
-                logger.LogInformation($"Topic '{topicName}' was created with {numPartitions} partitions.");
-            }
-            catch (CreateTopicsException e)
-            {
-                if (e.Results[0].Error.Code == ErrorCode.TopicAlreadyExists)
+                var topicSpecification = new TopicSpecification
                 {
-                    logger.LogInformation($"Topic '{topicName}' already exist.");
+                    Name = topic.TopicName,
+                    NumPartitions = topic.ParticionsCount,
+                    ReplicationFactor = topic.ReplicationFactor
+                };
+
+                try
+                {
+                    await adminClient.CreateTopicsAsync(new[] { topicSpecification });
+                    logger.LogInformation($"Topic '{topic.TopicName}' was created with {topic.ParticionsCount} partitions.");
                 }
-                else
+                catch (CreateTopicsException e)
                 {
-                    logger.LogError($"Error while creating topic: {e.Results[0].Error.Reason}");
-                    throw;
+                    if (e.Results[0].Error.Code == ErrorCode.TopicAlreadyExists)
+                    {
+                        logger.LogInformation($"Topic '{topic.TopicName}' already exist.");
+                    }
+                    else
+                    {
+                        logger.LogError($"Error while creating topic: {e.Results[0].Error.Reason}");
+                        throw;
+                    }
                 }
             }
         }

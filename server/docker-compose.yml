@@ -12,6 +12,11 @@ services:
     networks:
       - shared-network 
     restart: always
+    sysctls:
+      net.ipv4.tcp_keepalive_time: 60
+      net.ipv4.tcp_keepalive_intvl: 10
+      net.ipv4.tcp_keepalive_probes: 5
+
   comments-app:
     container_name: comments-app-server
     build:
