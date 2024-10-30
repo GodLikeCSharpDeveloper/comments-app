@@ -1,31 +1,57 @@
-﻿using Amazon.S3;
+﻿using Amazon.Auth.AccessControlPolicy;
+using Amazon.S3;
 using Amazon.S3.Model;
+using CommentApp.Common.Services.FileService;
+using Microsoft.AspNetCore.Http;
+using Polly;
+using Polly.Retry;
+using System;
+using System.Net;
+using System.Threading.Tasks;
+using Policy = Polly.Policy;
 
-namespace CommentApp.Common.Services.FileService
+public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger logger, string bucketName) : IFileService
 {
-    public class AmazonS3FileService(IAmazonS3 amazonS3Client) : IFileService
-    {
-        private readonly IAmazonS3 amazonS3Client = amazonS3Client;
-        private const string bucketName = "mycommentsappbucket";
-        public async Task<string> UploadFileAsync(IFormFile? file)
-        {
-            if (file == null)
-                return string.Empty;
-            using var fileStream = file.OpenReadStream();
-            var key = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-            var putRequest = new PutObjectRequest
-            {
-                BucketName = bucketName,
-                Key = key,
-                InputStream = fileStream,
-                ContentType = file.ContentType
-            };
-            var response = await amazonS3Client.PutObjectAsync(putRequest);
+    private readonly IAmazonS3 amazonS3Client = amazonS3Client;
+    private readonly string bucketName = bucketName;
 
-            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                return key;
-            else
-                throw new Exception("Error while uploading file into S3.");
-        }
+    private readonly AsyncRetryPolicy retryPolicy = Policy
+            .Handle<AmazonS3Exception>(ex =>
+                ex.StatusCode == HttpStatusCode.InternalServerError ||
+                ex.StatusCode == HttpStatusCode.ServiceUnavailable)
+            .Or<Exception>()
+            .WaitAndRetryAsync(
+                retryCount: 3,
+                sleepDurationProvider: attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)),
+                onRetry: (exception, timeSpan, retryCount, context) =>
+                {
+                    logger.LogWarning($"Retry {retryCount} encountered an error: {exception.Message}. Waiting {timeSpan} before next retry.");
+                }
+            );
+
+    public async Task UploadFileAsync(IFormFile? file, string fileName)
+    {
+        if (file == null)
+            return;
+
+        using var fileStream = file.OpenReadStream();
+        var putRequest = new PutObjectRequest
+        {
+            BucketName = bucketName,
+            Key = fileName,
+            InputStream = fileStream,
+            ContentType = file.ContentType
+        };
+
+        var response = await retryPolicy.ExecuteAsync(async () =>
+        {
+            var res = await amazonS3Client.PutObjectAsync(putRequest);
+            if (res.HttpStatusCode != HttpStatusCode.OK)
+                throw new AmazonS3Exception("Error while uploading file to S3.")
+                {
+                    StatusCode = res.HttpStatusCode
+                };
+            return res;
+        });
     }
 }

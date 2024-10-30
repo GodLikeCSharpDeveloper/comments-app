@@ -1,9 +1,12 @@
 ﻿using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
+using CommentApp.Common.AutoMapper;
 using CommentApp.Common.Data;
 using CommentApp.Common.Kafka.Consumer;
+using CommentApp.Common.Kafka.Producer;
 using CommentApp.Common.Kafka.TopicCreator;
+using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Models.Options;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
@@ -34,6 +37,9 @@ namespace CommentApp.Common.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, AmazonS3FileService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddSingleton<IKafkaQueueService, KafkaQueueService>();
+            services.AddSingleton<IAutoMapperService, AutoMapperService>();
             return services;
         }
 
@@ -161,7 +167,8 @@ namespace CommentApp.Common.Extensions
         {
             services.AddHostedService<RedisToDbBackgroundService>();
             services.AddHostedService<CommentConsumer>();
-            services.AddHostedService<KafkaQueueService>();
+            services.AddHostedService<KafkaHostedService>();
+            services.AddHostedService<QueuedHostedService>();
             return services;
         }
 

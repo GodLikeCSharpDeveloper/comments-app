@@ -10,6 +10,6 @@ namespace CommentsAppTests
     [TestFixture]
     public class AutomapTest
     {
-      
+        
     }
 }
