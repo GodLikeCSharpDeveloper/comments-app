@@ -54,7 +54,7 @@ namespace CommentApp.Common.Redis
 
                     var delay = CalculateExponentialBackoff(retryCount, settings.RetryDelayMilliseconds);
                     logger.LogError(ex, "Error processing messages from Redis. Retrying after {Delay} ms.", delay);
-                    await Task.Delay(delay, stoppingToken);
+                    await Task.Delay(delay);
                 }
             }
 

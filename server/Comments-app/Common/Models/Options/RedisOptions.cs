@@ -1,4 +1,6 @@
-﻿public class RedisOptions
+﻿using StackExchange.Redis;
+
+public class RedisOptions
 {
     public string ConnectionString { get; set; }
     public int SyncTimeout { get; set; }
@@ -11,7 +13,8 @@
 }
 public class BackgroundRedisOptions
 {
-    public string RedisQueueKey { get; set; }
+    public RedisKey RedisQueueKey { get => new RedisKey(RedisKeyValue); }
+    public string RedisKeyValue { get; set; }
     public int BatchSize { get; set; }
     public int SingleProcessingThreshold { get; set; }
     public int RetryDelayMilliseconds { get; set; }

@@ -43,7 +43,7 @@ namespace CommentsAppTests
             _mockAmazonS3Client.Verify(p => p.PutObjectAsync(It.IsAny<PutObjectRequest>(), new CancellationToken()), Times.Never);
         }
         [Test]
-        public async Task UploadFile_ThrowsInternalServerError_ShouldRetryThreeTimes()
+        public void UploadFile_ThrowsInternalServerError_ShouldRetryThreeTimes()
         {
             // Arrange
             var mockFormFile = new Mock<IFormFile>();
