@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.Services.FileServiceTests.BackgroundService.TaskQueueService
 {
     public class BackgroundTaskQueueTests
     {

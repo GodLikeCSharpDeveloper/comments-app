@@ -16,19 +16,19 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.Services.FileServiceTests
 {
     [TestFixture]
     public class AmazonFileServiceTests
     {
         private AmazonS3FileService _fileService;
         private Mock<AmazonS3Client> _mockAmazonS3Client;
-        private Mock<ILogger<CommentsController>> _loggerMock;
+        private Mock<ILogger<AmazonS3FileService>> _loggerMock;
         private Mock<IFormFile> mockFormFile;
         [SetUp]
         public void Setup()
         {
-            _loggerMock = new Mock<ILogger<CommentsController>>();
+            _loggerMock = new Mock<ILogger<AmazonS3FileService>>();
             _mockAmazonS3Client = new Mock<AmazonS3Client>();
             _fileService = new(_mockAmazonS3Client.Object, _loggerMock.Object, It.IsAny<string>());
             mockFormFile = new Mock<IFormFile>();
@@ -64,7 +64,7 @@ namespace CommentsAppTests
             //Assert
             Assert.That(exception, Is.InstanceOf<AmazonS3Exception>());
             Assert.That(exception.Message, Is.EqualTo("Error while uploading file to S3."));
-            
+
             _mockAmazonS3Client.Verify(
                 p => p.PutObjectAsync(It.IsAny<PutObjectRequest>(), It.IsAny<CancellationToken>()),
                 Times.Exactly(4));

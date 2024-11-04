@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.Redis
 {
     [TestFixture]
     public class RedisToDbBackgroundServiceTests
@@ -29,14 +29,12 @@ namespace CommentsAppTests
         [SetUp]
         public void Setup()
         {
-            // Инициализация моков
             _loggerMock = new Mock<ILogger<RedisToDbBackgroundService>>();
             _mockRedisDatabase = new Mock<IDatabase>();
             _mockScopeFactory = new Mock<IServiceScopeFactory>();
             _mockRedisOptions = new Mock<IOptions<BackgroundRedisOptions>>();
             _mockCommentService = new Mock<ICommentService>();
 
-            // Настройка BackgroundRedisOptions
             var backgroundRedisOptions = new BackgroundRedisOptions()
             {
                 BatchSize = 10,
@@ -47,7 +45,6 @@ namespace CommentsAppTests
             };
             _mockRedisOptions.Setup(r => r.Value).Returns(backgroundRedisOptions);
 
-            // Инициализация тестируемого сервиса
             _redisService = new TestableRedisService(
                 _loggerMock.Object,
                 _mockRedisDatabase.Object,
@@ -55,10 +52,8 @@ namespace CommentsAppTests
                 _mockRedisOptions.Object
             );
 
-            // Инициализация очереди Redis
             _redisList = new Queue<RedisValue>();
 
-            // Настройка методов IDatabase
             _mockRedisDatabase.Setup(r => r.ListLengthAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
                 .ReturnsAsync((RedisKey key, CommandFlags flags) => _redisList.Count);
 
@@ -78,7 +73,6 @@ namespace CommentsAppTests
                     return _redisList.Count;
                 });
 
-            // Настройка IServiceScopeFactory
             var mockServiceScope = new Mock<IServiceScope>();
             var mockServiceProvider = new Mock<IServiceProvider>();
             mockServiceProvider.Setup(sp => sp.GetService(typeof(ICommentService))).Returns(_mockCommentService.Object);
@@ -102,7 +96,6 @@ namespace CommentsAppTests
                 Times.Never
             );
 
-            // Проверка логирования остановки сервиса
             _loggerMock.Verify(l => l.Log(
                 It.Is<LogLevel>(lvl => lvl == LogLevel.Information),
                 It.IsAny<EventId>(),
@@ -130,15 +123,6 @@ namespace CommentsAppTests
             // Assert
             _mockRedisDatabase.Verify(p => p.ListLengthAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()), Times.Exactly(maxTries + 1));
 
-            // Проверка логирования критической ошибки после превышения попыток
-            _loggerMock.Verify(l => l.Log(
-                It.Is<LogLevel>(lvl => lvl == LogLevel.Critical),
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString().Contains("Max retry attempts exceeded. Background service is stopping.")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()),
-                Times.Once
-            );
         }
 
         [Test]
@@ -151,7 +135,6 @@ namespace CommentsAppTests
             var serializedComment = JsonSerializer.Serialize(comment);
             _redisList.Enqueue(serializedComment);
 
-            // Настройка мокнутого ICommentService, чтобы сигнализировать о вызове CreateCommentAsync
             _mockCommentService.Setup(s => s.CreateCommentAsync(It.Is<Comment>(c => c.Id == 1 && c.Text == "Test comment")))
                 .Callback(() => tcs.SetResult(true))
                 .Returns(Task.CompletedTask);

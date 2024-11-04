@@ -60,6 +60,12 @@ namespace CommentApp.Common.Controllers
                 return StatusCode(500, $"Error processing comment: {ex.Message}");
             }
         }
+        [HttpGet]
+        public async Task<IActionResult> GetComments([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        {
+            return Ok();
+        }
+
         private string GetNewNameAndUploadFile(IFormFile formFile)
         {
             var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);

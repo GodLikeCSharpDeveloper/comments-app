@@ -26,7 +26,7 @@ namespace CommentApp.Common.Repositories.CommentRepository
         }
         public async Task CreateCommentBatchAsync(List<Comment> comments)
         {
-            await dbContext.BulkInsertAsync(comments);
+            await dbContext.BulkInsertOrUpdateAsync(comments);
         }
         public async Task AddCommentAsync(Comment comment)
         {

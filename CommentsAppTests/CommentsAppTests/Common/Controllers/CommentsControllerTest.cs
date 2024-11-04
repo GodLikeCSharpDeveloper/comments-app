@@ -12,7 +12,7 @@ using CommentApp.Common.Models;
 using Microsoft.AspNetCore.Http;
 using CommentApp.Common.Services.FileService;
 using CommentApp.Common.AutoMapper;
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.Controllers
 {
     [TestFixture]
     public class CommentsControllerTests

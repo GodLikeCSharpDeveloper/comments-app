@@ -1,19 +1,33 @@
 ﻿using CommentApp.Common.Kafka.TopicCreator;
+using CommentApp.Common.Models.Options;
 using Confluent.Kafka;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace CommentApp.Common.Kafka.Consumer
 {
-    public class CommentConsumer(IConsumer<Null, string> consumer,
+    public class CommentConsumer : BackgroundService
+    {
+        private readonly IConsumer<Null, string> consumer;
+        private readonly ILogger<CommentConsumer> logger;
+        private readonly IKafkaTopicCreator kafkaTopicCreator;
+        private readonly IDatabase redisDatabase;
+        private readonly ConsumerOptions consumerOptions;
+        private int retryCount = 0;
+        public CommentConsumer(IConsumer<Null, string> consumer,
         ILogger<CommentConsumer> logger,
         IKafkaTopicCreator kafkaTopicCreator,
-        IDatabase redisDatabase) : BackgroundService
-    {
-        private readonly IConsumer<Null, string> consumer = consumer;
-        private readonly ILogger<CommentConsumer> logger = logger;
-        private readonly IKafkaTopicCreator kafkaTopicCreator = kafkaTopicCreator;
-        private readonly IDatabase redisDatabase = redisDatabase;
-        private const string RedisQueueKey = "comment_queue";
+        IDatabase redisDatabase,
+        IOptions<ConsumerOptions> settings)
+        {
+            this.consumer = consumer;
+            this.logger = logger;
+            this.kafkaTopicCreator = kafkaTopicCreator;
+            this.redisDatabase = redisDatabase;
+            this.consumerOptions = settings.Value;
+            this.consumer.Subscribe("comments-new");
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await kafkaTopicCreator.CreateTopicAsync();
@@ -27,38 +41,49 @@ namespace CommentApp.Common.Kafka.Consumer
 
         private async Task ConsumeComment(CancellationToken cancellationToken)
         {
-            consumer.Subscribe("comments-new");
-
-            try
+            while (!cancellationToken.IsCancellationRequested)
             {
-                while (!cancellationToken.IsCancellationRequested)
+                try
                 {
                     var consumeResult = consumer.Consume(cancellationToken);
-                    var messageValue = consumeResult.Message.Value;
+                    var messageValue = consumeResult?.Message.Value;
                     if (string.IsNullOrEmpty(messageValue)) throw new ArgumentException($"Comment can't be processed: {messageValue}");
-                    bool enqueued = await redisDatabase.ListRightPushAsync(RedisQueueKey, messageValue) > 0;
+                    bool enqueued = await redisDatabase.ListRightPushAsync(consumerOptions.CommentConsumerQueueKey, messageValue) > 0;
                     if (enqueued)
                     {
                         consumer.Commit(consumeResult);
                         logger.LogInformation($"Enqueued comment message: {consumeResult.Message.Key}");
                     }
                     else
-                        logger.LogWarning("Failed to enqueue message to Redis.");
-
+                        throw new Exception("Failed to enqueue message to Redis.");
+                    retryCount = 0;
+                }
+                catch (OperationCanceledException)
+                {
+                    logger.LogInformation("Consuming cancelled.");
+                    consumer.Close();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error occurred while consuming messages.");
+                    retryCount++;
+                    if (retryCount > consumerOptions.MaxRetryCount)
+                    {
+                        logger.LogCritical("Max retry attempts exceeded. Background service is stopping.");
+                        consumer.Close();
+                        break;
+                    }
+                    var delay = CalculateExponentialBackoff(retryCount, consumerOptions.RetryDelayMilliseconds);
+                    logger.LogError("Error processing messages from Redis. Retrying after {Delay} ms.", delay);
+                    await Task.Delay(delay);
                 }
             }
-            catch (OperationCanceledException)
-            {
-                logger.LogInformation("Consuming cancelled.");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error occurred while consuming messages.");
-            }
-            finally
-            {
-                consumer.Close();
-            }
+        }
+        private int CalculateExponentialBackoff(int retryCount, int baseDelay)
+        {
+            int delay = (int)(baseDelay * Math.Pow(2, retryCount));
+            return Math.Min(delay, consumerOptions.MaxRetryDelayMilliseconds);
         }
     }
 }

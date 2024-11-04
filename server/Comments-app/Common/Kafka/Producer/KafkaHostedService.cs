@@ -5,11 +5,11 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-public class KafkaHostedService(IProducer<Null, string> producer, ILogger<KafkaQueueService> logger, IKafkaQueueService kafkaQueueService) : BackgroundService
+public class KafkaHostedService(IProducer<Null, string> producer, ILogger<KafkaHostedService> logger, IKafkaQueueService kafkaQueueService) : BackgroundService
 {
     private readonly IProducer<Null, string> kafkaProducer = producer;
     private readonly Channel<Message<Null, string>> messageChannel = kafkaQueueService.MessageChannel;
-    private readonly ILogger<KafkaQueueService> logger = logger;
+    private readonly ILogger<KafkaHostedService> logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

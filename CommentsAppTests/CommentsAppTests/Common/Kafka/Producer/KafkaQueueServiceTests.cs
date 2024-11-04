@@ -6,7 +6,7 @@ using System;
 using Confluent.Kafka;
 using System.Threading.Channels;
 
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.Kafka.Producer
 {
     [TestFixture]
     public class KafkaQueueServiceTests

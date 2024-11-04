@@ -12,6 +12,6 @@ namespace CommentApp.Common.Models
         [EmailAddress]
         public string Email { get; set; }
         public string? HomePage { get; set; }
-        public ICollection<Comment> Comments { get; set; } = [];
+        public List<Comment> Comments { get; set; } = [];
     }
 }

@@ -1,4 +1,5 @@
 ﻿using CommentApp.Common.Models;
+using CommentApp.Common.Models.Options;
 using CommentApp.Common.Services.CommentService;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -6,18 +7,29 @@ using System.Text.Json;
 
 namespace CommentApp.Common.Redis
 {
-    public class RedisToDbBackgroundService(
+    public class RedisToDbBackgroundService : BackgroundService
+    {
+        private readonly ILogger<RedisToDbBackgroundService> logger;
+        private readonly IDatabase redisDatabase;
+        private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly BackgroundRedisOptions settings;
+        private int retryCount = 0;
+        public RedisToDbBackgroundService(
         ILogger<RedisToDbBackgroundService> logger,
         IDatabase redisDatabase,
-        IServiceScopeFactory serviceScopeFactory,
-        IOptions<BackgroundRedisOptions> settings) : BackgroundService
-    {
-        private readonly ILogger<RedisToDbBackgroundService> logger = logger;
-        private readonly IDatabase redisDatabase = redisDatabase;
-        private readonly IServiceScopeFactory serviceScopeFactory = serviceScopeFactory;
-        private readonly BackgroundRedisOptions settings = settings.Value;
-        private int retryCount = 0;
-
+        IServiceScopeFactory serviceScopeFactory)
+        {
+            this.logger = logger;
+            this.redisDatabase = redisDatabase;
+            this.serviceScopeFactory = serviceScopeFactory;
+            this.settings = GetOptions();
+        }
+        private BackgroundRedisOptions GetOptions()
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var options = scope.ServiceProvider.GetRequiredService<IOptions<BackgroundRedisOptions>>();
+            return options.Value;
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             logger.LogInformation("Redis to DB Background Service is starting.");
@@ -63,7 +75,8 @@ namespace CommentApp.Common.Redis
 
         private int CalculateExponentialBackoff(int retryCount, int baseDelay)
         {
-            return (int)(baseDelay * Math.Pow(2, retryCount));
+            int delay = (int)(baseDelay * Math.Pow(2, retryCount));
+            return Math.Min(delay, settings.MaxRetryDelayMilliseconds);
         }
 
         private async Task<List<Comment>> GetCommentsAsync(CancellationToken stoppingToken)

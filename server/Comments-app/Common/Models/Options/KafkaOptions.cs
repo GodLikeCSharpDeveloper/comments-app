@@ -15,4 +15,11 @@
         public int BatchSize { get; set; }
         public string Acks { get; set; }
     }
+    public class ConsumerOptions
+    {
+        public int RetryDelayMilliseconds { get; set; }
+        public int MaxRetryCount { get; set; }
+        public string CommentConsumerQueueKey { get; set; }
+        public int MaxRetryDelayMilliseconds { get; set; }
+    }
 }

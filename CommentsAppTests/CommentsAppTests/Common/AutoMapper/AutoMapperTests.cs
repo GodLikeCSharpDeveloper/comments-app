@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using CommentApp.Common.AutoMapper;
 
-namespace CommentsAppTests
+namespace CommentsAppTests.Common.AutoMapper
 {
     [TestFixture]
     public class AutoMapperTests

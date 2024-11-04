@@ -19,4 +19,5 @@ public class BackgroundRedisOptions
     public int SingleProcessingThreshold { get; set; }
     public int RetryDelayMilliseconds { get; set; }
     public int MaxRetryAttempts { get; set; }
+    public int MaxRetryDelayMilliseconds { get; set; }
 }

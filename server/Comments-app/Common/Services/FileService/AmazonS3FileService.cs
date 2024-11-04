@@ -10,10 +10,10 @@ using System.Net;
 using System.Threading.Tasks;
 using Policy = Polly.Policy;
 
-public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger logger, string bucketName) : IFileService
+public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger<AmazonS3FileService> logger) : IFileService
 {
     private readonly IAmazonS3 amazonS3Client = amazonS3Client;
-    private readonly string bucketName = bucketName;
+    private const string bucketName = "mycommentsappbucket";
 
     private readonly AsyncRetryPolicy retryPolicy = Policy
             .Handle<AmazonS3Exception>(ex =>

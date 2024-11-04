@@ -22,9 +22,9 @@ builder.Services.AddKafka(builder.Configuration);
 
 builder.Services.AddCustomHttpClient(builder.Configuration);
 
-builder.Services.AddBackgroundServices();
-
 builder.Services.AddBackgroundServiceOptions(builder.Configuration);
+
+builder.Services.AddBackgroundServices();
 
 builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 

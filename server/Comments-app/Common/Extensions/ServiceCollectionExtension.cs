@@ -40,6 +40,7 @@ namespace CommentApp.Common.Extensions
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddSingleton<IKafkaQueueService, KafkaQueueService>();
             services.AddSingleton<IAutoMapperService, AutoMapperService>();
+            services.AddSingleton<IRedisUserCacheService, RedisUserCacheService>();
             return services;
         }
 
@@ -165,10 +166,10 @@ namespace CommentApp.Common.Extensions
 
         public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
         {
-            services.AddHostedService<RedisToDbBackgroundService>();
             services.AddHostedService<CommentConsumer>();
             services.AddHostedService<KafkaHostedService>();
             services.AddHostedService<QueuedHostedService>();
+            services.AddHostedService<RedisToDbBackgroundService>();
             return services;
         }
 
