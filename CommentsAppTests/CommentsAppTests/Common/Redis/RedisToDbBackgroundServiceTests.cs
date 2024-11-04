@@ -48,8 +48,7 @@ namespace CommentsAppTests.Common.Redis
             _redisService = new TestableRedisService(
                 _loggerMock.Object,
                 _mockRedisDatabase.Object,
-                _mockScopeFactory.Object,
-                _mockRedisOptions.Object
+                _mockScopeFactory.Object
             );
 
             _redisList = new Queue<RedisValue>();
@@ -208,9 +207,8 @@ namespace CommentsAppTests.Common.Redis
         public TestableRedisService(
             ILogger<RedisToDbBackgroundService> logger,
             IDatabase redisDatabase,
-            IServiceScopeFactory serviceScopeFactory,
-            IOptions<BackgroundRedisOptions> settings)
-            : base(logger, redisDatabase, serviceScopeFactory, settings)
+            IServiceScopeFactory serviceScopeFactory)
+            : base(logger, redisDatabase, serviceScopeFactory)
         {
         }
 

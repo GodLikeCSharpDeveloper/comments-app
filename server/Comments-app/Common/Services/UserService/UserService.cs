@@ -1,16 +1,21 @@
 ﻿using CommentApp.Common.Models;
 using CommentApp.Common.Redis;
+using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
+using CommentApp.Common.Services.CommentService;
 
 namespace CommentApp.Common.Services.UserService
 {
-    public class UserService(IUserRepository userRepository, IRedisUserCacheService cacheService) : IUserService
+    public class UserService(IUserRepository userRepository, IRedisUserCacheService cacheService, ICommentRepository commentRepository) : IUserService
     {
         private readonly IUserRepository userRepository = userRepository;
         private readonly IRedisUserCacheService cacheService = cacheService;
+        private readonly ICommentRepository commentRepository = commentRepository;
         public async Task<List<User>> GetUsersAsync()
         {
-            return await userRepository.GetUsersAsync();
+            var users = await userRepository.GetUsersAsync();
+            users.ForEach(user => user.Comments.ForEach(comment => { comment.UserId = user.Id; comment.User = null; }));
+            return users;
         }
         public async Task<User?> GetUserByIdAsync(int id)
         {
@@ -43,8 +48,19 @@ namespace CommentApp.Common.Services.UserService
                     usersToAdd.Add(user);
             }
             await userRepository.CreateUserBatchAsync(usersToAdd);
-            await userRepository.UpdateUserBatchAsync(usersToUpdate);
+            var comments = ConvertUserToComments(usersToUpdate);
+            await commentRepository.CreateCommentBatchAsync(comments);
             await userRepository.SaveChangesAsync();
+            usersToAdd.ForEach(async user => await cacheService.AddUserToCache(user));
+        }
+        private List<Comment> ConvertUserToComments(List<User> users)
+        {
+            return users.Select(user =>
+            {
+                var comments = user.Comments;
+                comments.ForEach(com => com.UserId = user.Id);
+                return comments;
+            }).SelectMany(c => c).ToList();
         }
     }
 }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 using Polly;
 using Polly.Retry;
 
@@ -21,9 +23,9 @@ namespace LoadTester
 
     class Program
     {
-        private static readonly int TotalRequests = 10000;
-        private static readonly int ConcurrentRequests = 1000;
-        private static readonly string Url = "https://comments-app:8081/api/comments";
+        private static readonly int TotalRequests = 100;
+        private static readonly int ConcurrentRequests = 100;
+        private static readonly string Url = "https://comments-app:8081/comments";
 
         private static readonly HttpClient httpClient = CreateHttpClient();
 
@@ -59,17 +61,14 @@ namespace LoadTester
                     {
                         try
                         {
-                            var comment = new Comment
+                            var formData = new Dictionary<string, string>
                             {
-                                Text = new string('A', 500),
-                                Captcha = new string('B', 10),
-                                UserName = new string('C', 20),
-                                Email = $"test{i}@mail.com"
+                                { "Text", new string('A', 150) },
+                                { "Captcha", new string('B', 10) },
+                                { "UserName", new string('C', 20) },
+                                { "Email", "test@mail.com" }
                             };
-
-                            var json = JsonSerializer.Serialize(comment);
-                            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
+                            var content = new FormUrlEncodedContent(formData);
                             var response = await retryPolicy.ExecuteAsync(
                                 async (context) => await httpClient.PostAsync(Url, content),
                                 new Context($"Request-{requestId}")

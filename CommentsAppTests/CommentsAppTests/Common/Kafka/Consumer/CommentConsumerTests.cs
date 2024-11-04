@@ -26,7 +26,7 @@ namespace CommentsAppTests.Common.Kafka.Consumer
         private Mock<ILogger<CommentConsumer>> _loggerMock;
         private Mock<IKafkaTopicCreator> _mockKafkaTopicCreator;
         private Mock<IDatabase> _mockRedisDatabase;
-        private Mock<IOptions<ConsumerOptions>> _mockConsumerOptions;
+        private Mock<IServiceScopeFactory> _mockServiceScope;
         [SetUp]
         public void Setup()
         {
@@ -34,7 +34,7 @@ namespace CommentsAppTests.Common.Kafka.Consumer
             _mockRedisDatabase = new Mock<IDatabase>();
             _mockKafkaTopicCreator = new Mock<IKafkaTopicCreator>();
             _loggerMock = new Mock<ILogger<CommentConsumer>>();
-            _mockConsumerOptions = new Mock<IOptions<ConsumerOptions>>();
+            _mockServiceScope = new Mock<IServiceScopeFactory>();
             _mockConsumer.Setup(p => p.Consume(new CancellationToken())).Returns(new ConsumeResult<Null, string>() { Message = new Message<Null, string>() { Value = "Test value" } });
             var consumerOptions = new ConsumerOptions()
             {
@@ -43,9 +43,8 @@ namespace CommentsAppTests.Common.Kafka.Consumer
                 MaxRetryDelayMilliseconds = 500,
                 RetryDelayMilliseconds = 200
             };
-            _mockConsumerOptions.Setup(r => r.Value).Returns(consumerOptions);
             _commentConsumer = new TestableCommentConsumerService(
-                _mockConsumer.Object, _loggerMock.Object, _mockKafkaTopicCreator.Object, _mockRedisDatabase.Object, _mockConsumerOptions.Object
+                _mockConsumer.Object, _loggerMock.Object, _mockKafkaTopicCreator.Object, _mockRedisDatabase.Object, _mockServiceScope.Object
             );
         }
 
@@ -77,7 +76,7 @@ namespace CommentsAppTests.Common.Kafka.Consumer
         public async Task BackgroundRunning_ThrowsException_ShouldRetry()
         {
             // Arrange
-            var maxTries = _mockConsumerOptions.Object.Value.MaxRetryCount;
+            var maxTries = 4;
 
             _mockRedisDatabase.Setup(p => p.ListRightPushAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<When>(), CommandFlags.None))
                 .ThrowsAsync(new RedisServerException("Redis server error"));
@@ -95,7 +94,7 @@ namespace CommentsAppTests.Common.Kafka.Consumer
                 ILogger<CommentConsumer> logger,
                 IKafkaTopicCreator kafkaTopicCreator,
                 IDatabase redisDatabase,
-                IOptions<ConsumerOptions> options) : base(consumer, logger, kafkaTopicCreator, redisDatabase, options)
+                IServiceScopeFactory serviceScopeFactory) : base(consumer, logger, kafkaTopicCreator, redisDatabase, serviceScopeFactory)
             {
             }
 

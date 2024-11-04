@@ -1,5 +1,6 @@
 ﻿using CommentApp.Common.Data;
 using CommentApp.Common.Models;
+using CommentApp.Common.Models.DTOs;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +17,10 @@ namespace CommentApp.Common.Repositories.CommentRepository
                 .Include(c => c.Replies)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
-
+        public IQueryable<Comment> GetAllCommentsQuery()
+        {
+            return dbContext.Comments.Include(c => c.User).AsNoTracking();
+        }
         public async Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(int userId)
         {
             return await dbContext.Comments

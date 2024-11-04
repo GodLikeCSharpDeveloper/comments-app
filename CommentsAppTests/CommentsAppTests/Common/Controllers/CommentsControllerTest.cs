@@ -12,6 +12,7 @@ using CommentApp.Common.Models;
 using Microsoft.AspNetCore.Http;
 using CommentApp.Common.Services.FileService;
 using CommentApp.Common.AutoMapper;
+using CommentApp.Common.Services.CommentService;
 namespace CommentsAppTests.Common.Controllers
 {
     [TestFixture]
@@ -23,6 +24,7 @@ namespace CommentsAppTests.Common.Controllers
         private CommentsController _controller;
         private Mock<IFileService> _fileServiceMock;
         private Mock<IBackgroundTaskQueue> _backgroundTaskQueueMock;
+        private Mock<ICommentService> _commentServiceMock;
 
         [SetUp]
         public void Setup()
@@ -32,7 +34,8 @@ namespace CommentsAppTests.Common.Controllers
             _kafkaMock = new Mock<IKafkaQueueService>();
             _fileServiceMock = new Mock<IFileService>();
             _backgroundTaskQueueMock = new Mock<IBackgroundTaskQueue>();
-            _controller = new CommentsController(_loggerMock.Object, _mapperMock.Object, _fileServiceMock.Object, _kafkaMock.Object, _backgroundTaskQueueMock.Object);
+            _commentServiceMock = new Mock<ICommentService>();
+            _controller = new CommentsController(_loggerMock.Object, _mapperMock.Object, _fileServiceMock.Object, _kafkaMock.Object, _backgroundTaskQueueMock.Object, _commentServiceMock.Object);
         }
 
         private void AddModelErrors(Dictionary<string, string> errors)

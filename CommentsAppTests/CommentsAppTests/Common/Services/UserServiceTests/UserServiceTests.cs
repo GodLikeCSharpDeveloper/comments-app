@@ -20,13 +20,15 @@ namespace CommentsAppTests.Common.Services.UserServiceTests
         private Mock<IUserRepository> mockUserRepository;
         private IUserService userService;
         private Mock<IRedisUserCacheService> mockRedisCacheService;
+        private Mock<ICommentRepository> mockCommentRepository;
 
         [SetUp]
         public void Setup()
         {
             mockUserRepository = new Mock<IUserRepository>();
             mockRedisCacheService = new Mock<IRedisUserCacheService>();
-            userService = new UserService(mockUserRepository.Object, mockRedisCacheService.Object);
+            mockCommentRepository = new Mock<ICommentRepository>();
+            userService = new UserService(mockUserRepository.Object, mockRedisCacheService.Object, mockCommentRepository.Object);
         }
         [Test]
         public async Task CreateCommentBatchAsync_SeparateUsersByExistingAndNonExisting()

@@ -30,6 +30,8 @@ builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 
 await builder.Services.AddAmazonS3(builder.Configuration);
 
+await builder.Services.InitializeCache();
+
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();

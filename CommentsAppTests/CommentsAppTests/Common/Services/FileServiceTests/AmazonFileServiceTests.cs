@@ -30,7 +30,7 @@ namespace CommentsAppTests.Common.Services.FileServiceTests
         {
             _loggerMock = new Mock<ILogger<AmazonS3FileService>>();
             _mockAmazonS3Client = new Mock<AmazonS3Client>();
-            _fileService = new(_mockAmazonS3Client.Object, _loggerMock.Object, It.IsAny<string>());
+            _fileService = new(_mockAmazonS3Client.Object, _loggerMock.Object);
             mockFormFile = new Mock<IFormFile>();
         }
         [Test]

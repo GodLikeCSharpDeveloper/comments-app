@@ -3,6 +3,7 @@ using CommentApp.Common.AutoMapper;
 using CommentApp.Common.Kafka.Producer;
 using CommentApp.Common.Models;
 using CommentApp.Common.Models.DTOs;
+using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,15 @@ namespace CommentApp.Common.Controllers
     public class CommentsController(ILogger<CommentsController> logger,
         IAutoMapperService mapper, IFileService fileService,
         IKafkaQueueService kafkaQueueService,
-        IBackgroundTaskQueue backgroundTaskQueue) : ControllerBase
+        IBackgroundTaskQueue backgroundTaskQueue,
+        ICommentService commentService) : ControllerBase
     {
         private readonly ILogger<CommentsController> logger = logger;
         private readonly IAutoMapperService mapper = mapper;
         private readonly IFileService fileService = fileService;
         private readonly IKafkaQueueService kafkaQueueService = kafkaQueueService;
         private readonly IBackgroundTaskQueue backgroundTaskQueue = backgroundTaskQueue;
+        private readonly ICommentService commentService = commentService;
 
         [HttpPost]
         public async Task<IActionResult> PostComment([FromForm] CreateCommentDto request)
@@ -61,11 +64,11 @@ namespace CommentApp.Common.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> GetComments([FromQuery] int pageNumber, [FromQuery] int pageSize)
+        public async Task<IActionResult> GetComments([FromQuery] CommentQueryParameters queryParameters)
         {
-            return Ok();
+            var response = await commentService.GetCommentsByQueryAsync(queryParameters);
+            return Ok(response);
         }
-
         private string GetNewNameAndUploadFile(IFormFile formFile)
         {
             var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);

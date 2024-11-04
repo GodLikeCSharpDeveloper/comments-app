@@ -1,6 +1,7 @@
 ﻿using CommentApp.Common.Kafka.TopicCreator;
 using CommentApp.Common.Models.Options;
 using Confluent.Kafka;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -13,21 +14,28 @@ namespace CommentApp.Common.Kafka.Consumer
         private readonly IKafkaTopicCreator kafkaTopicCreator;
         private readonly IDatabase redisDatabase;
         private readonly ConsumerOptions consumerOptions;
+        private readonly IServiceScopeFactory serviceScopeFactory;
         private int retryCount = 0;
         public CommentConsumer(IConsumer<Null, string> consumer,
         ILogger<CommentConsumer> logger,
         IKafkaTopicCreator kafkaTopicCreator,
         IDatabase redisDatabase,
-        IOptions<ConsumerOptions> settings)
+        IServiceScopeFactory serviceScopeFactory)
         {
             this.consumer = consumer;
             this.logger = logger;
             this.kafkaTopicCreator = kafkaTopicCreator;
             this.redisDatabase = redisDatabase;
-            this.consumerOptions = settings.Value;
+            this.serviceScopeFactory = serviceScopeFactory;
+            this.consumerOptions = GetOptions();
             this.consumer.Subscribe("comments-new");
         }
-
+        private ConsumerOptions GetOptions()
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+            var options = scope.ServiceProvider.GetRequiredService<IOptions<ConsumerOptions>>();
+            return options.Value;
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await kafkaTopicCreator.CreateTopicAsync();

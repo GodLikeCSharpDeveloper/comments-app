@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CommentsApp.Common.Migrations
+namespace CommentApp.Migrations
 {
     [DbContext(typeof(CommentsAppDbContext))]
-    [Migration("20241023173236_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241104220050_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace CommentsApp.Common.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Comments_app.Common.Models.Comment", b =>
+            modelBuilder.Entity("CommentApp.Common.Models.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace CommentsApp.Common.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("FilePath")
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("ParentCommentId")
@@ -51,6 +51,9 @@ namespace CommentsApp.Common.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("TextFileUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -66,7 +69,7 @@ namespace CommentsApp.Common.Migrations
                     b.ToTable("Comments");
                 });
 
-            modelBuilder.Entity("Comments_app.Common.Models.User", b =>
+            modelBuilder.Entity("CommentApp.Common.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,14 +98,14 @@ namespace CommentsApp.Common.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Comments_app.Common.Models.Comment", b =>
+            modelBuilder.Entity("CommentApp.Common.Models.Comment", b =>
                 {
-                    b.HasOne("Comments_app.Common.Models.Comment", "ParentComment")
+                    b.HasOne("CommentApp.Common.Models.Comment", "ParentComment")
                         .WithMany("Replies")
                         .HasForeignKey("ParentCommentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Comments_app.Common.Models.User", "User")
+                    b.HasOne("CommentApp.Common.Models.User", "User")
                         .WithMany("Comments")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -113,12 +116,12 @@ namespace CommentsApp.Common.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Comments_app.Common.Models.Comment", b =>
+            modelBuilder.Entity("CommentApp.Common.Models.Comment", b =>
                 {
                     b.Navigation("Replies");
                 });
 
-            modelBuilder.Entity("Comments_app.Common.Models.User", b =>
+            modelBuilder.Entity("CommentApp.Common.Models.User", b =>
                 {
                     b.Navigation("Comments");
                 });

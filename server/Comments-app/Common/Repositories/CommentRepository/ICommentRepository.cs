@@ -6,6 +6,7 @@ namespace CommentApp.Common.Repositories.CommentRepository
     {
         Task<Comment?> GetCommentByIdAsync(int id);
         Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(int userId);
+        IQueryable<Comment> GetAllCommentsQuery();
         Task CreateCommentBatchAsync(List<Comment> comments);
         Task AddCommentAsync(Comment comment);
         Task SaveChangesAsync();

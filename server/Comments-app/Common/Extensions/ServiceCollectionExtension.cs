@@ -43,7 +43,19 @@ namespace CommentApp.Common.Extensions
             services.AddSingleton<IRedisUserCacheService, RedisUserCacheService>();
             return services;
         }
-
+        public static async Task<IServiceCollection> InitializeCache(this IServiceCollection services)
+        {
+            services.AddSingleton<RedisDbCacheInitializeService>();
+            services.AddSingleton<RedisCleanupBackgroundService>();
+            using (var serviceProvider = services.BuildServiceProvider())
+            {
+                var cacheService = serviceProvider.GetRequiredService<RedisDbCacheInitializeService>();
+                var cleanupService = serviceProvider.GetRequiredService<RedisCleanupBackgroundService>();
+                await cleanupService.StopAsync();
+                await cacheService.InitializeCache();
+            }
+            return services;
+        }
         public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
         {
             var redisOptions = configuration.GetSection("Redis").Get<RedisOptions>();
@@ -197,6 +209,7 @@ namespace CommentApp.Common.Extensions
         public static IServiceCollection AddBackgroundServiceOptions(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<BackgroundRedisOptions>(configuration.GetSection("BackgroundRedisOptions"));
+            services.Configure<ConsumerOptions>(configuration.GetSection("KafkaCommentConsumer"));
             return services;
         }
     }

@@ -1,4 +1,5 @@
 ﻿using CommentApp.Common.Models;
+using CommentApp.Common.Models.DTOs;
 
 namespace CommentApp.Common.Services.CommentService
 {
@@ -6,6 +7,7 @@ namespace CommentApp.Common.Services.CommentService
     {
         Task<Comment?> GetCommentByIdAsync(int id);
         Task CreateCommentAsync(Comment comment);
+        Task<List<Comment>> GetCommentsByQueryAsync(CommentQueryParameters queryParameters);
         Task CreateCommentBatchAsync(List<Comment> comments);
     }
 }
