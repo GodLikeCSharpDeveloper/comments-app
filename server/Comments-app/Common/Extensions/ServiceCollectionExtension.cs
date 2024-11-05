@@ -41,16 +41,16 @@ namespace CommentApp.Common.Extensions
             services.AddSingleton<IKafkaQueueService, KafkaQueueService>();
             services.AddSingleton<IAutoMapperService, AutoMapperService>();
             services.AddSingleton<IRedisUserCacheService, RedisUserCacheService>();
+            services.AddSingleton<RedisDbCacheInitializeService>();
+            services.AddSingleton<RedisCleanupService>();
             return services;
         }
         public static async Task<IServiceCollection> InitializeCache(this IServiceCollection services)
         {
-            services.AddSingleton<RedisDbCacheInitializeService>();
-            services.AddSingleton<RedisCleanupBackgroundService>();
             using (var serviceProvider = services.BuildServiceProvider())
             {
                 var cacheService = serviceProvider.GetRequiredService<RedisDbCacheInitializeService>();
-                var cleanupService = serviceProvider.GetRequiredService<RedisCleanupBackgroundService>();
+                var cleanupService = serviceProvider.GetRequiredService<RedisCleanupService>();
                 await cleanupService.StopAsync();
                 await cacheService.InitializeCache();
             }
@@ -188,7 +188,11 @@ namespace CommentApp.Common.Extensions
         public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<CommentsAppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), sqlOptions => 
+                    sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 4,
+                    maxRetryDelay: TimeSpan.FromSeconds(2),
+                    errorNumbersToAdd: null)));
             return services;
         }
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using StackExchange.Redis;
 
-public class RedisCleanupBackgroundService(IConnectionMultiplexer redis)
+public class RedisCleanupService(IConnectionMultiplexer redis)
 {
     private readonly IConnectionMultiplexer _redis = redis;
 

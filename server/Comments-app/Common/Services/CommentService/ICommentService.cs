@@ -9,5 +9,7 @@ namespace CommentApp.Common.Services.CommentService
         Task CreateCommentAsync(Comment comment);
         Task<List<Comment>> GetCommentsByQueryAsync(CommentQueryParameters queryParameters);
         Task CreateCommentBatchAsync(List<Comment> comments);
+        Task<List<Comment>> GetAllCommentsAsync();
+        Task<int> CountAllComments();
     }
 }

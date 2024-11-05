@@ -2,6 +2,8 @@
 {
     public interface IFileService
     {
-        Task UploadFileAsync(IFormFile? file, string fileName);
+        Task UploadFileAsync(Stream fileStream, string fileName, string contentType);
+        Task<IFormFile> GetFileAsync(string fileName);
+        string GeneratePreSignedURL(string fileName);
     }
 }

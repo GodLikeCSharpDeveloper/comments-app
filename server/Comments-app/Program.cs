@@ -2,10 +2,15 @@ using CommentApp.Common.Data;
 using CommentApp.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -30,8 +35,6 @@ builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 
 await builder.Services.AddAmazonS3(builder.Configuration);
 
-await builder.Services.InitializeCache();
-
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
@@ -50,6 +53,7 @@ using (var scope = app.Services.CreateScope())
     dbContext.Database.Migrate();
 }
 
+await builder.Services.InitializeCache();
 app.MapControllers();
 
 app.Run();

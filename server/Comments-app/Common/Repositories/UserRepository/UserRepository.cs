@@ -2,6 +2,7 @@
 using CommentApp.Common.Models;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using Polly;
 
 namespace CommentApp.Common.Repositories.UserRepository
 {
@@ -44,9 +45,26 @@ namespace CommentApp.Common.Repositories.UserRepository
 
         public async Task CreateUserBatchAsync(List<User> users)
         {
-            var bulkConfig = new BulkConfig { IncludeGraph = true };
-            await context.BulkInsertAsync(users, bulkConfig);
+            var strategy = context.Database.CreateExecutionStrategy();
+
+            await strategy.ExecuteAsync(async () =>
+            {
+                using var transaction = await context.Database.BeginTransactionAsync();
+                try
+                {
+                    var bulkConfig = new BulkConfig { IncludeGraph = true };
+                    await context.BulkInsertAsync(users, bulkConfig);
+                    await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
+
         public async Task UpdateUserBatchAsync(List<User> users)
         {
             var bulkConfig = new BulkConfig { IncludeGraph = true };

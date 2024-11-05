@@ -18,18 +18,30 @@ namespace CommentApp.Common.Services.CommentService
         {
             return await commentRepository.GetCommentByIdAsync(id);
         }
+        public async Task<List<Comment>> GetAllCommentsAsync()
+        {
+            return await commentRepository.GetAllCommentsAsync();
+        }
         public async Task<List<Comment>> GetCommentsByQueryAsync(CommentQueryParameters queryParameters)
         {
-            var query = commentRepository.GetAllCommentsQuery();
-            var validSortProperties = new[] { "UserName", "CreatedAt", "Content" };
-            if (!validSortProperties.Contains(queryParameters.SortBy))
-                queryParameters.SortBy = "UserName";
+            var query = commentRepository.GetAllParrentCommentsQuery();
+            var validSortProperties = new[] { "User.UserName", "User.Email" };
+            foreach (var property in validSortProperties)
+            {
+                if (property.Contains(queryParameters.SortBy, StringComparison.InvariantCultureIgnoreCase))
+                    queryParameters.SortBy = property;
+            }
+            if (queryParameters.SortBy == "undefined")
+                queryParameters.SortBy = "User.UserName";
             var sortDirection = queryParameters.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
             query = query.OrderBy($"{queryParameters.SortBy} {sortDirection}");
-            query = query.Skip((queryParameters.PageNumber - 1) * queryParameters.PageSize).Take(queryParameters.PageSize);
+            query = query.Skip((queryParameters.PageNumber) * queryParameters.PageSize).Take(queryParameters.PageSize);
             return await query.ToListAsync();
         }
-
+        public async Task<int> CountAllComments()
+        {
+            return await commentRepository.GetAllParrentCommentsQuery().CountAsync();
+        }
         public async Task CreateCommentAsync(Comment comment)
         {
             ArgumentNullException.ThrowIfNull(comment);

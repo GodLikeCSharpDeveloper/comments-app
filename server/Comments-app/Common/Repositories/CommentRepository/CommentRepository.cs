@@ -17,9 +17,37 @@ namespace CommentApp.Common.Repositories.CommentRepository
                 .Include(c => c.Replies)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
-        public IQueryable<Comment> GetAllCommentsQuery()
+        public async Task<List<Comment>> GetAllCommentsAsync()
         {
-            return dbContext.Comments.Include(c => c.User).AsNoTracking();
+            var comments = await dbContext.Comments
+                .Where(c => c.ParentCommentId == null)
+                .Include(c => c.User)
+                .ToListAsync();
+
+            foreach (var comment in comments)
+            {
+                await LoadRepliesRecursively(comment);
+            }
+
+            return comments;
+        }
+        private async Task LoadRepliesRecursively(Comment comment)
+        {
+            await dbContext.Entry(comment)
+                .Collection(c => c.Replies)
+                .Query()
+                .Include(c => c.User)
+                .LoadAsync();
+
+            foreach (var reply in comment.Replies)
+            {
+                await LoadRepliesRecursively(reply);
+            }
+        }
+
+        public IQueryable<Comment> GetAllParrentCommentsQuery()
+        {
+            return dbContext.Comments.Include(c => c.User).Where(p => p.ParentCommentId == null).AsNoTracking();
         }
         public async Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(int userId)
         {

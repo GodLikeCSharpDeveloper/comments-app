@@ -22,7 +22,11 @@ namespace CommentApp.Common.Redis
                 return;
             user.Comments.ForEach(com => { com.UserId = user.Id; com.User = null; });
             var cacheKey = $"user:{user.Email}";
-            var userData = JsonConvert.SerializeObject(user);
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            var userData = JsonConvert.SerializeObject(user, settings);
             await database.StringSetAsync(cacheKey, userData);
         }
     }

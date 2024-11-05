@@ -31,7 +31,7 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
             dbContext.Database.OpenConnection();
-            userRepository = new UserRepository(dbContext);
+            userRepository = new UserRepository(dbContext); 
         }
 
         [TearDown]

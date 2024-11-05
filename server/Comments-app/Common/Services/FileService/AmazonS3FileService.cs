@@ -3,6 +3,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using CommentApp.Common.Services.FileService;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Polly;
 using Polly.Retry;
 using System;
@@ -29,20 +30,16 @@ public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger<AmazonS3FileS
                 }
             );
 
-    public async Task UploadFileAsync(IFormFile? file, string fileName)
+    public async Task UploadFileAsync(Stream fileStream, string fileName, string contentType)
     {
-        if (file == null)
-            return;
-
-        using var fileStream = file.OpenReadStream();
+        ArgumentNullException.ThrowIfNull(fileStream);
         var putRequest = new PutObjectRequest
         {
             BucketName = bucketName,
             Key = fileName,
             InputStream = fileStream,
-            ContentType = file.ContentType
+            ContentType = contentType
         };
-
         var response = await retryPolicy.ExecuteAsync(async () =>
         {
             var res = await amazonS3Client.PutObjectAsync(putRequest);
@@ -53,5 +50,39 @@ public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger<AmazonS3FileS
                 };
             return res;
         });
+    }
+
+    public async Task<IFormFile> GetFileAsync(string fileName)
+    {
+        var request = new GetObjectRequest
+        {
+            BucketName = bucketName,
+            Key = fileName
+        };
+
+        using GetObjectResponse response = await amazonS3Client.GetObjectAsync(request);
+        using var memoryStream = new MemoryStream();
+        await response.ResponseStream.CopyToAsync(memoryStream);
+        memoryStream.Position = 0;
+        string contentType = response.Headers["Content-Type"] ?? "application/octet-stream";
+
+        var formFile = new FormFile(memoryStream, 0, memoryStream.Length, fileName, fileName)
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = contentType,
+        };
+        return formFile;
+    }
+    public string GeneratePreSignedURL(string fileName)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = bucketName,
+            Key = fileName,
+            Expires = DateTime.UtcNow.AddMinutes(10),
+            Verb = HttpVerb.GET
+        };
+        string url = amazonS3Client.GetPreSignedURL(request);
+        return url;
     }
 }

@@ -23,8 +23,8 @@ namespace LoadTester
 
     class Program
     {
-        private static readonly int TotalRequests = 100;
-        private static readonly int ConcurrentRequests = 100;
+        private static readonly int TotalRequests = 1000;
+        private static readonly int ConcurrentRequests = 1000;
         private static readonly string Url = "https://comments-app:8081/comments";
 
         private static readonly HttpClient httpClient = CreateHttpClient();
@@ -41,82 +41,83 @@ namespace LoadTester
         {
             Console.WriteLine("Starting Load Tester...");
 
-                Console.WriteLine("Load test started...");
+            Console.WriteLine("Load test started...");
 
-                int successful = 0;
-                int failed = 0;
+            int successful = 0;
+            int failed = 0;
 
-                var semaphore = new SemaphoreSlim(ConcurrentRequests);
-                var tasks = new Task[TotalRequests];
+            var semaphore = new SemaphoreSlim(ConcurrentRequests);
+            var tasks = new Task[TotalRequests];
 
-                var startTime = DateTime.UtcNow;
+            var startTime = DateTime.UtcNow;
 
-                for (int i = 0; i < TotalRequests; i++)
+            for (int i = 0; i < TotalRequests; i++)
+            {
+                await semaphore.WaitAsync();
+
+                int requestId = i;
+
+                var random = new Random();
+                tasks[i] = Task.Run(async () =>
                 {
-                    await semaphore.WaitAsync();
-
-                    int requestId = i;
-
-                    tasks[i] = Task.Run(async () =>
+                    try
                     {
-                        try
+                        var formData = new Dictionary<string, string>
                         {
-                            var formData = new Dictionary<string, string>
-                            {
-                                { "Text", new string('A', 150) },
+                                { "Text", new string('A', 50) + random.NextInt64(1, 1000) },
                                 { "Captcha", new string('B', 10) },
-                                { "UserName", new string('C', 20) },
-                                { "Email", "test@mail.com" }
-                            };
-                            var content = new FormUrlEncodedContent(formData);
-                            var response = await retryPolicy.ExecuteAsync(
-                                async (context) => await httpClient.PostAsync(Url, content),
-                                new Context($"Request-{requestId}")
-                            );
+                                { "UserName", new string('C', 5) + random.NextInt64(1, 1000) },
+                                { "Email", $"test{random.NextInt64(1, 1000)}@mail.com" }
+                        };
+                        var content = new FormUrlEncodedContent(formData);
+                        var response = await retryPolicy.ExecuteAsync(
+                            async (context) => await httpClient.PostAsync(Url, content),
+                            new Context($"Request-{requestId}")
+                        );
 
-                            if (response.IsSuccessStatusCode)
-                            {
-                                Interlocked.Increment(ref successful);
-                            }
-                            else
-                            {
-                                Interlocked.Increment(ref failed);
-                            }
-                        }
-                        catch (Exception ex)
+                        if (response.IsSuccessStatusCode)
                         {
-                            Console.WriteLine($"Request {requestId} failed with exception: {ex.Message}");
+                            Interlocked.Increment(ref successful);
+                        }
+                        else
+                        {
                             Interlocked.Increment(ref failed);
                         }
-                        finally
-                        {
-                            semaphore.Release();
-                        }
-                    });
-
-                    if (i % 10 == 0 && i > 0)
-                    {
-                        Console.WriteLine($"{i} requests queued...");
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Request {requestId} failed with exception: {ex.Message} - {ex.InnerException}");
+                        Interlocked.Increment(ref failed);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
+                });
+
+                if (i % 10 == 0 && i > 0)
+                {
+                    Console.WriteLine($"{i} requests queued...");
                 }
+            }
 
-                await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks);
 
-                var elapsed = DateTime.UtcNow - startTime;
+            var elapsed = DateTime.UtcNow - startTime;
 
-                Console.WriteLine("Load test finished.");
-                Console.WriteLine($"Total requests: {TotalRequests}");
-                Console.WriteLine($"Successful requests: {successful}");
-                Console.WriteLine($"Failed requests: {failed}");
-                Console.WriteLine($"Time taken: {elapsed.TotalSeconds} seconds");
-          
+            Console.WriteLine("Load test finished.");
+            Console.WriteLine($"Total requests: {TotalRequests}");
+            Console.WriteLine($"Successful requests: {successful}");
+            Console.WriteLine($"Failed requests: {failed}");
+            Console.WriteLine($"Time taken: {elapsed.TotalSeconds} seconds");
+
         }
 
         private static HttpClient CreateHttpClient()
         {
             var handler = new HttpClientHandler
             {
-                MaxConnectionsPerServer = 10000,             
+                MaxConnectionsPerServer = 10000,
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             };
 

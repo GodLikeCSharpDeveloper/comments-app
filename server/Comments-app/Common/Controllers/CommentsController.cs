@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using Amazon.S3;
+using AutoMapper;
 using CommentApp.Common.AutoMapper;
 using CommentApp.Common.Kafka.Producer;
 using CommentApp.Common.Models;
@@ -26,7 +28,7 @@ namespace CommentApp.Common.Controllers
         private readonly IBackgroundTaskQueue backgroundTaskQueue = backgroundTaskQueue;
         private readonly ICommentService commentService = commentService;
 
-        [HttpPost]
+        [HttpPost("post")]
         public async Task<IActionResult> PostComment([FromForm] CreateCommentDto request)
         {
             if (!ModelState.IsValid)
@@ -69,22 +71,81 @@ namespace CommentApp.Common.Controllers
             var response = await commentService.GetCommentsByQueryAsync(queryParameters);
             return Ok(response);
         }
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllComments()
+        {
+            var response = await commentService.GetAllCommentsAsync();
+            return Ok(response);
+        }
+        [HttpGet("count")]
+        public async Task<IActionResult> CountComments()
+        {
+            var response = await commentService.CountAllComments();
+            return Ok(response);
+        }
+        [HttpGet("fileUrl")]
+        public async Task<IActionResult> GetPresignedUrl([FromQuery] string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                return BadRequest("File path is required.");
+            }
+
+            var presignedUrl = fileService.GeneratePreSignedURL(filePath);
+            return await Task.FromResult(Ok(presignedUrl));
+        }
+        [HttpGet]
+        public IActionResult GetCaptcha()
+        {
+            var captchaUrl = "";
+            return Ok(captchaUrl);
+
+        }
+
+        [HttpPost]
+        public IActionResult ValidateCaptcha([FromBody] string userInput)
+        {
+            var captchaCode = HttpContext.Session.GetString("CaptchaCode");
+            return Ok(captchaCode == userInput);
+        }
+
+        private string SaveToTempFile(IFormFile formFile)
+        {
+            var tempFilePath = Path.GetTempFileName();
+            using (var stream = new FileStream(tempFilePath, FileMode.Create))
+            {
+                formFile.CopyTo(stream);
+            }
+            return tempFilePath;
+        }
+
         private string GetNewNameAndUploadFile(IFormFile formFile)
         {
             var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);
+            var tempFilePath = SaveToTempFile(formFile);
+
             backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
             {
                 try
                 {
-                    await fileService.UploadFileAsync(formFile, newFileName);
+                    using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read);
+                    await fileService.UploadFileAsync(fileStream, newFileName, formFile.ContentType);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Error while uploading file");
                 }
+                finally
+                {
+                    if (System.IO.File.Exists(tempFilePath))
+                    {
+                        System.IO.File.Delete(tempFilePath);
+                    }
+                }
             });
             return newFileName;
         }
+
 
     }
 }
