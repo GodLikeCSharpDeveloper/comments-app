@@ -119,11 +119,11 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
             // Arrange
             var comments = new List<Comment>
             {
-                new Comment { Text = "Comment 1", Captcha = "captcha" },
-                new Comment { Text = "Comment 2", Captcha = "captcha" },
-                new Comment { Text = "Comment 3", Captcha = "captcha" },
-                new Comment { Text = "Comment 4", Captcha = "captcha" },
-                new Comment { Text = "Comment 5", Captcha = "captcha" }
+                new Comment { Text = "Comment 1"},
+                new Comment { Text = "Comment 2"},
+                new Comment { Text = "Comment 3"},
+                new Comment { Text = "Comment 4" },
+                new Comment { Text = "Comment 5"}
             };
             var existingUser = new User() { UserName = "Test User1", Email = "testEmail1@mail.com" };
             var users = new List<User>()

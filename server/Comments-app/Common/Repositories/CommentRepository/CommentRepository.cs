@@ -17,6 +17,15 @@ namespace CommentApp.Common.Repositories.CommentRepository
                 .Include(c => c.Replies)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
+        public async Task<int> GetLastAddedCommentForUser(string email)
+        {
+            var latestCommentId = await dbContext.Comments
+            .Where(c => c.User.Email == email)
+            .OrderByDescending(c => c.CreatedAt)
+            .Select(c => c.Id)
+            .FirstOrDefaultAsync();
+            return latestCommentId;
+        }
         public async Task<List<Comment>> GetAllCommentsAsync()
         {
             var comments = await dbContext.Comments

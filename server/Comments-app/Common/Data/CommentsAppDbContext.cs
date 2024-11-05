@@ -25,10 +25,6 @@ namespace CommentApp.Common.Data
                 entity.Property(c => c.Text)
                       .IsRequired()
                       .HasMaxLength(500);
-
-                entity.Property(c => c.Captcha)
-                      .IsRequired()
-                      .HasMaxLength(10);
             });
 
             modelBuilder.Entity<Comment>()

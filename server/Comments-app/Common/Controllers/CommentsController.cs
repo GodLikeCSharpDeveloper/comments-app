@@ -10,6 +10,7 @@ using CommentApp.Common.Services.FileService;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using CommentApp.Common.Services.CaptchaService;
 
 namespace CommentApp.Common.Controllers
 {
@@ -19,7 +20,8 @@ namespace CommentApp.Common.Controllers
         IAutoMapperService mapper, IFileService fileService,
         IKafkaQueueService kafkaQueueService,
         IBackgroundTaskQueue backgroundTaskQueue,
-        ICommentService commentService) : ControllerBase
+        ICommentService commentService,
+        ICaptchaService captchaService) : ControllerBase
     {
         private readonly ILogger<CommentsController> logger = logger;
         private readonly IAutoMapperService mapper = mapper;
@@ -27,6 +29,7 @@ namespace CommentApp.Common.Controllers
         private readonly IKafkaQueueService kafkaQueueService = kafkaQueueService;
         private readonly IBackgroundTaskQueue backgroundTaskQueue = backgroundTaskQueue;
         private readonly ICommentService commentService = commentService;
+        private readonly ICaptchaService captchaService = captchaService;
 
         [HttpPost("post")]
         public async Task<IActionResult> PostComment([FromForm] CreateCommentDto request)
@@ -36,7 +39,6 @@ namespace CommentApp.Common.Controllers
                 logger.LogWarning("Invalid model state for Comment: {@Comment}", request);
                 return BadRequest(ModelState);
             }
-
             try
             {
                 var comment = mapper.Map<CreateCommentDto, Comment>(request);
@@ -65,24 +67,35 @@ namespace CommentApp.Common.Controllers
                 return StatusCode(500, $"Error processing comment: {ex.Message}");
             }
         }
+        [HttpGet("lastComment")]
+        public async Task<IActionResult> GetLastAddedCommentForUser([FromQuery] string email)
+        {
+            if (string.IsNullOrEmpty(email))            
+                return BadRequest("Email is required");            
+            var lastCommentId = await commentService.GetLastAddedCommentForUser(email);
+            return Ok(lastCommentId);
+        }
         [HttpGet]
         public async Task<IActionResult> GetComments([FromQuery] CommentQueryParameters queryParameters)
         {
             var response = await commentService.GetCommentsByQueryAsync(queryParameters);
             return Ok(response);
         }
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllComments()
         {
             var response = await commentService.GetAllCommentsAsync();
             return Ok(response);
         }
+
         [HttpGet("count")]
         public async Task<IActionResult> CountComments()
         {
             var response = await commentService.CountAllComments();
             return Ok(response);
         }
+
         [HttpGet("fileUrl")]
         public async Task<IActionResult> GetPresignedUrl([FromQuery] string filePath)
         {
@@ -94,21 +107,13 @@ namespace CommentApp.Common.Controllers
             var presignedUrl = fileService.GeneratePreSignedURL(filePath);
             return await Task.FromResult(Ok(presignedUrl));
         }
-        [HttpGet]
-        public IActionResult GetCaptcha()
+
+        [HttpPost("verify")]
+        public async Task<IActionResult> ValidateCaptcha([FromQuery] string token)
         {
-            var captchaUrl = "";
-            return Ok(captchaUrl);
-
+            var response = await captchaService.ValidateToken(token);
+            return Ok(response);
         }
-
-        [HttpPost]
-        public IActionResult ValidateCaptcha([FromBody] string userInput)
-        {
-            var captchaCode = HttpContext.Session.GetString("CaptchaCode");
-            return Ok(captchaCode == userInput);
-        }
-
         private string SaveToTempFile(IFormFile formFile)
         {
             var tempFilePath = Path.GetTempFileName();
@@ -145,7 +150,5 @@ namespace CommentApp.Common.Controllers
             });
             return newFileName;
         }
-
-
     }
 }

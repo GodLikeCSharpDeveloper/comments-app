@@ -9,9 +9,6 @@ namespace CommentApp.Common.Models.DTOs
         public string Text { get; set; }
 
         [Required]
-        [StringLength(20)]
-        public string Captcha { get; set; }
-        [Required]
         [StringLength(50)]
         public string UserName { get; set; }
         [Required]
@@ -23,7 +20,7 @@ namespace CommentApp.Common.Models.DTOs
 
         public IFormFile? TextFile { get; set; }
 
-        public int? ParentCommentId { get; set; }
+        public string? ParentCommentId { get; set; }
     }
 
 }

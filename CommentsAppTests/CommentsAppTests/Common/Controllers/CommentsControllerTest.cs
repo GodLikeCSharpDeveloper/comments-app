@@ -71,7 +71,6 @@ namespace CommentsAppTests.Common.Controllers
             var invalidRequest = new CreateCommentDto
             {
                 Text = null,
-                Captcha = null,
                 UserName = null,
                 Email = null
             };
@@ -99,7 +98,6 @@ namespace CommentsAppTests.Common.Controllers
             var invalidRequest = new CreateCommentDto
             {
                 Text = new string('b', 201),
-                Captcha = new string('c', 21),
                 UserName = new string('u', 51),
                 Email = new string('e', 51)
             };
@@ -128,7 +126,6 @@ namespace CommentsAppTests.Common.Controllers
             var validRequest = new CreateCommentDto
             {
                 Text = "Valid text",
-                Captcha = "ValidCaptcha",
                 UserName = "ValidUser",
                 Email = "user@example.com",
                 Image = imageFile
@@ -137,7 +134,6 @@ namespace CommentsAppTests.Common.Controllers
             var comment = new Comment
             {
                 Text = validRequest.Text,
-                Captcha = validRequest.Captcha,
                 User = new User
                 {
                     UserName = validRequest.UserName,

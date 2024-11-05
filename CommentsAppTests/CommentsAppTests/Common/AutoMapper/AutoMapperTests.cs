@@ -42,7 +42,6 @@ namespace CommentsAppTests.Common.AutoMapper
             var input = new CreateCommentDto
             {
                 Text = "Valid text",
-                Captcha = "ValidCaptcha",
                 UserName = "ValidUser",
                 Email = "user@example.com",
                 Image = imageFile
@@ -51,7 +50,6 @@ namespace CommentsAppTests.Common.AutoMapper
             var output = new Comment
             {
                 Text = input.Text,
-                Captcha = input.Captcha,
                 User = new User
                 {
                     UserName = input.UserName,
@@ -66,7 +64,6 @@ namespace CommentsAppTests.Common.AutoMapper
             Assert.Multiple(() =>
             {
                 Assert.That(input.Text, Is.EqualTo(output.Text));
-                Assert.That(input.Captcha, Is.EqualTo(output.Captcha));
                 Assert.That(string.IsNullOrEmpty(output.ImageUrl), Is.True);
                 Assert.That(input.UserName, Is.EqualTo(output.User.UserName));
                 Assert.That(input.Email, Is.EqualTo(output.User.Email));

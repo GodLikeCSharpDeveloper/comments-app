@@ -22,6 +22,10 @@ namespace CommentApp.Common.Services.CommentService
         {
             return await commentRepository.GetAllCommentsAsync();
         }
+        public async Task<int> GetLastAddedCommentForUser(string email)
+        {
+            return await commentRepository.GetLastAddedCommentForUser(email);
+        }
         public async Task<List<Comment>> GetCommentsByQueryAsync(CommentQueryParameters queryParameters)
         {
             var query = commentRepository.GetAllParrentCommentsQuery();

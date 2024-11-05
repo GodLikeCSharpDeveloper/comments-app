@@ -11,6 +11,7 @@ using CommentApp.Common.Models.Options;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
+using CommentApp.Common.Services.CaptchaService;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
 using CommentApp.Common.Services.SecretService;
@@ -37,6 +38,7 @@ namespace CommentApp.Common.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, AmazonS3FileService>();
+            services.AddScoped<ICaptchaService, CaptchaService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddSingleton<IKafkaQueueService, KafkaQueueService>();
             services.AddSingleton<IAutoMapperService, AutoMapperService>();
@@ -166,12 +168,12 @@ namespace CommentApp.Common.Extensions
                 });
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder
-                        .WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials());
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
             });
             return services;
         }

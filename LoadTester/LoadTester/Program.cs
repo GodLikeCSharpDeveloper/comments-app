@@ -16,7 +16,6 @@ namespace LoadTester
     {
         public int Id { get; set; }
         public string Text { get; set; }
-        public string Captcha { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
     }
@@ -65,7 +64,6 @@ namespace LoadTester
                         var formData = new Dictionary<string, string>
                         {
                                 { "Text", new string('A', 50) + random.NextInt64(1, 1000) },
-                                { "Captcha", new string('B', 10) },
                                 { "UserName", new string('C', 5) + random.NextInt64(1, 1000) },
                                 { "Email", $"test{random.NextInt64(1, 1000)}@mail.com" }
                         };

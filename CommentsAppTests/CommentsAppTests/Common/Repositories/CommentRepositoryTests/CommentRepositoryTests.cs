@@ -50,8 +50,7 @@ namespace CommentsAppTests.Common.Repositories.CommentRepositoryTests
             {
                 Id = 1,
                 Text = "Test comment",
-                UserId = user.Id,
-                Captcha = "captcha"
+                UserId = user.Id
             };
 
             await dbContext.Comments.AddAsync(comment);
@@ -89,8 +88,8 @@ namespace CommentsAppTests.Common.Repositories.CommentRepositoryTests
             var user = new User { Id = 1, UserName = "Test User" };
             var comments = new List<Comment>
             {
-                new Comment { Id = 1, Text = "Comment 1", UserId = user.Id, Captcha = "captcha" },
-                new Comment { Id = 2, Text = "Comment 2", UserId = user.Id, Captcha = "captcha" }
+                new Comment { Id = 1, Text = "Comment 1", UserId = user.Id },
+                new Comment { Id = 2, Text = "Comment 2", UserId = user.Id }
             };
 
             await dbContext.Comments.AddRangeAsync(comments);
@@ -110,7 +109,7 @@ namespace CommentsAppTests.Common.Repositories.CommentRepositoryTests
         public async Task AddCommentAsync_AddsCommentToDatabase()
         {
             // Arrange
-            var comment = new Comment { Id = 1, Text = "New Comment", UserId = 1, Captcha = "captcha" };
+            var comment = new Comment { Id = 1, Text = "New Comment", UserId = 1 };
 
             // Act
             await commentRepository.AddCommentAsync(comment);
@@ -128,8 +127,8 @@ namespace CommentsAppTests.Common.Repositories.CommentRepositoryTests
             // Arrange
             var comments = new List<Comment>
             {
-                new Comment { Id = 2, Text = "Comment 1", UserId = 1, Captcha = "captcha" },
-                new Comment { Id = 3, Text = "Comment 2", UserId = 1, Captcha = "captcha" }
+                new Comment { Id = 2, Text = "Comment 1", UserId = 1 },
+                new Comment { Id = 3, Text = "Comment 2", UserId = 1 }
             };
 
             // Act

@@ -11,5 +11,6 @@ namespace CommentApp.Common.Services.CommentService
         Task CreateCommentBatchAsync(List<Comment> comments);
         Task<List<Comment>> GetAllCommentsAsync();
         Task<int> CountAllComments();
+        Task<int> GetLastAddedCommentForUser(string email);
     }
 }
