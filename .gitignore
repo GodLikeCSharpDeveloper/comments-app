@@ -32,3 +32,12 @@ obj
 *.props
 *.targets
 packages
+/server/Comments-app/appsettings.json
+*.sample
+/comments-app.git/HEAD
+/comments-app.git/config
+/comments-app.git/description
+/comments-app.git/info/exclude
+/comments-app.git/objects/pack/pack-5a7355f5ee1bfc3264af00f062cc24fe071f2935.idx
+/comments-app.git/objects/pack/pack-5a7355f5ee1bfc3264af00f062cc24fe071f2935.pack
+/comments-app.git/packed-refs

@@ -68,7 +68,6 @@ namespace CommentApp.Common.Repositories.UserRepository
         public async Task UpdateUserBatchAsync(List<User> users)
         {
             var bulkConfig = new BulkConfig { IncludeGraph = true };
-            await context.BulkInsertAsync(users);
             await context.BulkUpdateAsync(users, bulkConfig);
         }
     }

@@ -11,6 +11,7 @@ using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using CommentApp.Common.Services.CaptchaService;
+using CommentApp.Common.Services.FileService.FileProcessingService;
 
 namespace CommentApp.Common.Controllers
 {
@@ -19,17 +20,17 @@ namespace CommentApp.Common.Controllers
     public class CommentsController(ILogger<CommentsController> logger,
         IAutoMapperService mapper, IFileService fileService,
         IKafkaQueueService kafkaQueueService,
-        IBackgroundTaskQueue backgroundTaskQueue,
         ICommentService commentService,
-        ICaptchaService captchaService) : ControllerBase
+        ICaptchaService captchaService,
+        IFileProcessingService fileProcessingService) : ControllerBase
     {
         private readonly ILogger<CommentsController> logger = logger;
         private readonly IAutoMapperService mapper = mapper;
         private readonly IFileService fileService = fileService;
         private readonly IKafkaQueueService kafkaQueueService = kafkaQueueService;
-        private readonly IBackgroundTaskQueue backgroundTaskQueue = backgroundTaskQueue;
         private readonly ICommentService commentService = commentService;
         private readonly ICaptchaService captchaService = captchaService;
+        private readonly IFileProcessingService fileProcessingService = fileProcessingService;
 
         [HttpPost("post")]
         public async Task<IActionResult> PostComment([FromForm] CreateCommentDto request)
@@ -47,11 +48,11 @@ namespace CommentApp.Common.Controllers
 
                 if (request.Image != null)
                 {
-                    comment.ImageUrl = GetNewNameAndUploadFile(request.Image);
+                    comment.ImageUrl = fileProcessingService.GetNewNameAndUploadFile(request.Image);
                 }
                 if (request.TextFile != null)
                 {
-                    comment.TextFileUrl = GetNewNameAndUploadFile(request.TextFile);
+                    comment.TextFileUrl = fileProcessingService.GetNewNameAndUploadFile(request.TextFile);
                 }
                 var commentJson = JsonConvert.SerializeObject(comment);
 
@@ -70,8 +71,8 @@ namespace CommentApp.Common.Controllers
         [HttpGet("lastComment")]
         public async Task<IActionResult> GetLastAddedCommentForUser([FromQuery] string email)
         {
-            if (string.IsNullOrEmpty(email))            
-                return BadRequest("Email is required");            
+            if (string.IsNullOrEmpty(email))
+                return BadRequest("Email is required");
             var lastCommentId = await commentService.GetLastAddedCommentForUser(email);
             return Ok(lastCommentId);
         }
@@ -113,42 +114,6 @@ namespace CommentApp.Common.Controllers
         {
             var response = await captchaService.ValidateToken(token);
             return Ok(response);
-        }
-        private string SaveToTempFile(IFormFile formFile)
-        {
-            var tempFilePath = Path.GetTempFileName();
-            using (var stream = new FileStream(tempFilePath, FileMode.Create))
-            {
-                formFile.CopyTo(stream);
-            }
-            return tempFilePath;
-        }
-
-        private string GetNewNameAndUploadFile(IFormFile formFile)
-        {
-            var newFileName = Guid.NewGuid().ToString() + Path.GetExtension(formFile.FileName);
-            var tempFilePath = SaveToTempFile(formFile);
-
-            backgroundTaskQueue.QueueBackgroundWorkItem(async token =>
-            {
-                try
-                {
-                    using var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read);
-                    await fileService.UploadFileAsync(fileStream, newFileName, formFile.ContentType);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "Error while uploading file");
-                }
-                finally
-                {
-                    if (System.IO.File.Exists(tempFilePath))
-                    {
-                        System.IO.File.Delete(tempFilePath);
-                    }
-                }
-            });
-            return newFileName;
         }
     }
 }

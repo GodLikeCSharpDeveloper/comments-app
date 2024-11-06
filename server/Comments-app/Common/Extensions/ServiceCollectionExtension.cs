@@ -14,6 +14,7 @@ using CommentApp.Common.Repositories.UserRepository;
 using CommentApp.Common.Services.CaptchaService;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
+using CommentApp.Common.Services.FileService.FileProcessingService;
 using CommentApp.Common.Services.SecretService;
 using CommentApp.Common.Services.UserService;
 using Confluent.Kafka;
@@ -38,6 +39,7 @@ namespace CommentApp.Common.Extensions
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IFileService, AmazonS3FileService>();
+            services.AddScoped<IFileProcessingService, FileProcessingService>();
             services.AddScoped<ICaptchaService, CaptchaService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddSingleton<IKafkaQueueService, KafkaQueueService>();

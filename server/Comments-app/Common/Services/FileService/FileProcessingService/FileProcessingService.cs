@@ -1,19 +1,12 @@
 ﻿namespace CommentApp.Common.Services.FileService.FileProcessingService
 {
-    public class FileProcessingService : IFileProcessingService
+    public class FileProcessingService(IFileService fileService, IBackgroundTaskQueue backgroundTaskQueue, ILogger<FileProcessingService> logger) : IFileProcessingService
     {
-        private readonly IFileService fileService;
-        private readonly IBackgroundTaskQueue backgroundTaskQueue;
-        private readonly ILogger<FileProcessingService> logger;
+        private readonly IFileService fileService = fileService;
+        private readonly IBackgroundTaskQueue backgroundTaskQueue = backgroundTaskQueue;
+        private readonly ILogger<FileProcessingService> logger = logger;
 
-        public FileProcessingService(IFileService fileService, IBackgroundTaskQueue backgroundTaskQueue, ILogger<FileProcessingService> logger)
-        {
-            this.fileService = fileService;
-            this.backgroundTaskQueue = backgroundTaskQueue;
-            this.logger = logger;
-        }
-
-        public string SaveToTempFile(IFormFile formFile)
+        private string SaveToTempFile(IFormFile formFile)
         {
             var tempFilePath = Path.GetTempFileName();
             using (var stream = new FileStream(tempFilePath, FileMode.Create))

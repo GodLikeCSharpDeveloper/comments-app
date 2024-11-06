@@ -56,8 +56,9 @@ namespace CommentsAppTests.Common.Services.UserServiceTests
             await userService.CreateOrUpdateUserBatchAsync(users);
 
             // Assert
-            mockUserRepository.Verify(t=>t.CreateUserBatchAsync(It.IsAny<List<User>>()), Times.Once);
-            mockUserRepository.Verify(t => t.UpdateUserBatchAsync(It.IsAny<List<User>>()), Times.Once);
+            mockCommentRepository.Verify(t => t.CreateCommentBatchAsync(It.IsAny<List<Comment>>()), Times.Once);
+            mockRedisCacheService.Verify(t => t.AddUserToCache(It.IsAny<User>()), Times.Never);
+            mockUserRepository.Verify(t => t.SaveChangesAsync(), Times.Once);
         }
     }
 }

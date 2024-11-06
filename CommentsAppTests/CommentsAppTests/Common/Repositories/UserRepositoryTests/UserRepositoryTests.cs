@@ -42,12 +42,10 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
         }
 
         [Test]
-        public async Task GetUserByIdAsync_ReturnsComment_WhenUserExists()
+        public async Task GetUserByIdAsync_ReturnsUser_WhenUserExists()
         {
             // Arrange
             var user = new User { UserName = "Test User", Email = "testEmail@mail.com" };
-
-
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
@@ -65,7 +63,7 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
         }
 
         [Test]
-        public async Task GetUserByIdAsync_ReturnsNull_WhenCommentDoesNotExist()
+        public async Task GetUserByIdAsync_ReturnsNull_WhenUserDoesNotExist()
         {
             // Act
             var result = await userRepository.GetUserByIdAsync(999);
@@ -75,12 +73,10 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
         }
 
         [Test]
-        public async Task GetUserByEmailAsync_ReturnsUser()
+        public async Task GetUserByEmailAsync_ReturnsUser_WhenEmailExists()
         {
             // Arrange
             var user = new User { UserName = "Test User", Email = "testEmail@mail.com" };
-
-
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
@@ -114,42 +110,189 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
         }
 
         [Test]
-        public async Task CreateCommentBatchAsync_AddsCommentsToDatabase()
+        public async Task CreateUserBatchAsync_AddsUsersToDatabase()
         {
             // Arrange
-            var comments = new List<Comment>
+            var users = new List<User>
             {
-                new Comment { Text = "Comment 1"},
-                new Comment { Text = "Comment 2"},
-                new Comment { Text = "Comment 3"},
-                new Comment { Text = "Comment 4" },
-                new Comment { Text = "Comment 5"}
+                new User { UserName = "User1", Email = "user1@mail.com" },
+                new User { UserName = "User2", Email = "user2@mail.com" },
+                new User { UserName = "User3", Email = "user3@mail.com" }
             };
-            var existingUser = new User() { UserName = "Test User1", Email = "testEmail1@mail.com" };
-            var users = new List<User>()
-            {
-                new User() { UserName = "Test User2", Email = "testEmail2@mail.com", Comments = [comments[0], comments[1]] },
-                new User() { UserName = "Test User3", Email = "testEmail3@mail.com", Comments = [comments[3]] },
-                new User() { UserName = "Test User4", Email = "testEmail4@mail.com", Comments = [comments[4]] }
-            };
-
 
             // Act
-            var test = await userRepository.GetAllUsersAsync();
-            await userRepository.AddUserAsync(existingUser);
-            await dbContext.SaveChangesAsync();
-            existingUser.Comments = [comments[2]];
-            await userRepository.UpdateUserBatchAsync([existingUser]);
             await userRepository.CreateUserBatchAsync(users);
             await userRepository.SaveChangesAsync();
 
             // Assert
-            var commentsFromDb = await dbContext.Comments.ToListAsync();
-            var usersFromDb= await dbContext.Users.ToListAsync();
+            var usersFromDb = await dbContext.Users.ToListAsync();
+            Assert.That(usersFromDb, Has.Count.EqualTo(3));
+            foreach (var user in users)
+            {
+                Assert.That(usersFromDb.Any(u => u.Email == user.Email), Is.True);
+            }
+        }
+
+        [Test]
+        public async Task UpdateUserBatchAsync_UpdatesUsersInDatabase()
+        {
+            // Arrange
+            var users = new List<User>
+            {
+                new User { UserName = "User1", Email = "user7@mail.com" },
+                new User { UserName = "User2", Email = "user8@mail.com" }
+            };
+
+            await dbContext.Users.AddRangeAsync(users);
+            await dbContext.SaveChangesAsync();
+
+            // Modify users
+            users[0].UserName = "UpdatedUser1";
+            users[1].Email = "updatedUser2@mail.com";
+
+            // Act
+            await userRepository.UpdateUserBatchAsync(users);
+            await userRepository.SaveChangesAsync();
+
+            // Assert
+            var updatedUser1 = await dbContext.Users.FindAsync(users[0].Id);
+            var updatedUser2 = await dbContext.Users.FindAsync(users[1].Id);
+
             Assert.Multiple(() =>
             {
-                Assert.That(commentsFromDb, Has.Count.EqualTo(5));
-                Assert.That(usersFromDb, Has.Count.EqualTo(4));
+                Assert.That(updatedUser1.UserName, Is.EqualTo("UpdatedUser1"));
+                Assert.That(updatedUser2.Email, Is.EqualTo("updatedUser2@mail.com"));
+            });
+        }
+
+        [Test]
+        public async Task GetUsersAsync_ReturnsAllUsers_WithComments()
+        {
+            // Arrange
+            var users = new List<User>
+            {
+                new User
+                {
+                    UserName = "User1",
+                    Email = "user1@mail.com",
+                    Comments = new List<Comment>
+                    {
+                        new Comment { Text = "Comment1" },
+                        new Comment { Text = "Comment2" }
+                    }
+                },
+                new User
+                {
+                    UserName = "User2",
+                    Email = "user2@mail.com",
+                    Comments = new List<Comment>
+                    {
+                        new Comment { Text = "Comment3" }
+                    }
+                }
+            };
+
+            await dbContext.Users.AddRangeAsync(users);
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await userRepository.GetUsersAsync();
+
+            // Assert
+            Assert.That(result, Has.Count.EqualTo(2));
+            foreach (var user in result)
+            {
+                if (user.UserName == "User1")
+                {
+                    Assert.That(user.Comments, Has.Count.EqualTo(2));
+                }
+                else if (user.UserName == "User2")
+                {
+                    Assert.That(user.Comments, Has.Count.EqualTo(1));
+                }
+            }
+        }
+
+        [Test]
+        public async Task GetAllUsersAsync_ReturnsAllUsers_WithComments()
+        {
+            // Arrange
+            var users = new List<User>
+            {
+                new User
+                {
+                    UserName = "User1",
+                    Email = "user1@mail.com",
+                    Comments = new List<Comment>
+                    {
+                        new Comment { Text = "Comment1" }
+                    }
+                },
+                new User
+                {
+                    UserName = "User2",
+                    Email = "user2@mail.com",
+                    Comments = new List<Comment>
+                    {
+                        new Comment { Text = "Comment2" },
+                        new Comment { Text = "Comment3" }
+                    }
+                }
+            };
+
+            await dbContext.Users.AddRangeAsync(users);
+            await dbContext.SaveChangesAsync();
+
+            // Act
+            var result = await userRepository.GetAllUsersAsync();
+
+            // Assert
+            Assert.That(result.Count(), Is.EqualTo(2));
+            foreach (var user in result)
+            {
+                if (user.UserName == "User1")
+                {
+                    Assert.That(user.Comments, Has.Count.EqualTo(1));
+                }
+                else if (user.UserName == "User2")
+                {
+                    Assert.That(user.Comments, Has.Count.EqualTo(2));
+                }
+            }
+        }
+
+        [Test]
+        public async Task UpdateUserBatchAsync_DoesNotThrow_WhenUpdatingNonExistentUsers()
+        {
+            // Arrange
+            var users = new List<User>
+            {
+                new User { Id = 999, UserName = "NonExistentUser", Email = "nonexistent@mail.com" }
+            };
+
+            // Act & Assert
+            Assert.DoesNotThrowAsync(async () =>
+            {
+                await userRepository.UpdateUserBatchAsync(users);
+                await userRepository.SaveChangesAsync();
+            });
+        }
+
+        [Test]
+        public async Task AddUserAsync_ThrowsException_WhenAddingDuplicateEmail()
+        {
+            // Arrange
+            var user1 = new User { UserName = "User1", Email = "duplicate@mail.com" };
+            var user2 = new User { UserName = "User2", Email = "duplicate@mail.com" };
+
+            await dbContext.Users.AddAsync(user1);
+            await dbContext.SaveChangesAsync();
+
+            // Act & Assert
+            await userRepository.AddUserAsync(user2);
+            Assert.ThrowsAsync<DbUpdateException>(async () =>
+            {
+                await userRepository.SaveChangesAsync();
             });
         }
     }

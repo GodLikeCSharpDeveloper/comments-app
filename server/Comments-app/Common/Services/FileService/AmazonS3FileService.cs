@@ -32,7 +32,8 @@ public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger<AmazonS3FileS
 
     public async Task UploadFileAsync(Stream fileStream, string fileName, string contentType)
     {
-        ArgumentNullException.ThrowIfNull(fileStream);
+        if (fileStream == null)
+            return;
         var putRequest = new PutObjectRequest
         {
             BucketName = bucketName,

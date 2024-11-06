@@ -24,7 +24,7 @@ namespace CommentApp.Common.Data
             {
                 entity.Property(c => c.Text)
                       .IsRequired()
-                      .HasMaxLength(500);
+                      .HasMaxLength(200);
             });
 
             modelBuilder.Entity<Comment>()

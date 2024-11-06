@@ -162,7 +162,7 @@ namespace CommentsAppTests.Common.Kafka.Producer
             await executeTask;
 
             // Assert
-            Assert.IsTrue(executeTask.IsCompleted);
+            Assert.That(executeTask.IsCompleted, Is.True);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace CommentsAppTests.Common.Kafka.Producer
             await service.StopAsync(CancellationToken.None);
 
             // Assert
-            Assert.IsTrue(messageChannel.Reader.Completion.IsCompleted);
+            Assert.That(messageChannel.Reader.Completion.IsCompleted, Is.True);
         }
     }
 }

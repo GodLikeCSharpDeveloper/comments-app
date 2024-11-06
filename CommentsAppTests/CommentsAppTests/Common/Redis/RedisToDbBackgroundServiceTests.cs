@@ -1,4 +1,5 @@
 ﻿using CommentApp.Common.Models;
+using CommentApp.Common.Models.Options;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Services.CommentService;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,7 @@ namespace CommentsAppTests.Common.Redis
         private Mock<IOptions<BackgroundRedisOptions>> _mockRedisOptions;
         private Mock<ICommentService> _mockCommentService;
         private Queue<RedisValue> _redisList;
+        private Mock<IServiceScope> _mockServiceScope;
 
         [SetUp]
         public void Setup()
@@ -34,7 +36,8 @@ namespace CommentsAppTests.Common.Redis
             _mockScopeFactory = new Mock<IServiceScopeFactory>();
             _mockRedisOptions = new Mock<IOptions<BackgroundRedisOptions>>();
             _mockCommentService = new Mock<ICommentService>();
-
+            _mockServiceScope = new Mock<IServiceScope>();
+            var _mockServiceProvider = new Mock<IServiceProvider>();
             var backgroundRedisOptions = new BackgroundRedisOptions()
             {
                 BatchSize = 10,
@@ -43,6 +46,10 @@ namespace CommentsAppTests.Common.Redis
                 RetryDelayMilliseconds = 100,
                 SingleProcessingThreshold = 3
             };
+            _mockServiceProvider.Setup(sp => sp.GetService(typeof(IOptions<BackgroundRedisOptions>)))
+                .Returns(Options.Create(backgroundRedisOptions));
+            _mockScopeFactory.Setup(r => r.CreateScope()).Returns(_mockServiceScope.Object);
+            _mockServiceScope.Setup(r => r.ServiceProvider).Returns(_mockServiceProvider.Object);
             _mockRedisOptions.Setup(r => r.Value).Returns(backgroundRedisOptions);
 
             _redisService = new TestableRedisService(

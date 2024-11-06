@@ -47,9 +47,11 @@ namespace CommentApp.Common.Services.UserService
                 else
                     usersToAdd.Add(user);
             }
-            await userRepository.CreateUserBatchAsync(usersToAdd);
+            if (usersToAdd.Count > 0)
+                await userRepository.CreateUserBatchAsync(usersToAdd);
             var comments = ConvertUserToComments(usersToUpdate);
-            await commentRepository.CreateCommentBatchAsync(comments);
+            if (comments.Count > 0)
+                await commentRepository.CreateCommentBatchAsync(comments);
             await userRepository.SaveChangesAsync();
             usersToAdd.ForEach(async user => await cacheService.AddUserToCache(user));
         }

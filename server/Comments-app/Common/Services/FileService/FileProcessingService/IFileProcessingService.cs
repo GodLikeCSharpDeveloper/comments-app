@@ -1,6 +1,7 @@
 ﻿namespace CommentApp.Common.Services.FileService.FileProcessingService
 {
-    public class IFileProcessingService
+    public interface IFileProcessingService
     {
+        string GetNewNameAndUploadFile(IFormFile formFile);
     }
 }

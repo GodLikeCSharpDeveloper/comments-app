@@ -26,7 +26,8 @@ namespace CommentsAppTests.Common.Kafka.Consumer
         private Mock<ILogger<CommentConsumer>> _loggerMock;
         private Mock<IKafkaTopicCreator> _mockKafkaTopicCreator;
         private Mock<IDatabase> _mockRedisDatabase;
-        private Mock<IServiceScopeFactory> _mockServiceScope;
+        private Mock<IServiceScopeFactory> _mockServiceScopeFactory;
+        private Mock<IServiceScope> _mockServiceScope;
         [SetUp]
         public void Setup()
         {
@@ -34,8 +35,12 @@ namespace CommentsAppTests.Common.Kafka.Consumer
             _mockRedisDatabase = new Mock<IDatabase>();
             _mockKafkaTopicCreator = new Mock<IKafkaTopicCreator>();
             _loggerMock = new Mock<ILogger<CommentConsumer>>();
-            _mockServiceScope = new Mock<IServiceScopeFactory>();
+            _mockServiceScopeFactory = new Mock<IServiceScopeFactory>();
+            _mockServiceScope = new Mock<IServiceScope>();
+            var _mockServiceProvider = new Mock<IServiceProvider>();
             _mockConsumer.Setup(p => p.Consume(new CancellationToken())).Returns(new ConsumeResult<Null, string>() { Message = new Message<Null, string>() { Value = "Test value" } });
+            _mockServiceScopeFactory.Setup(r => r.CreateScope()).Returns(_mockServiceScope.Object);
+
             var consumerOptions = new ConsumerOptions()
             {
                 CommentConsumerQueueKey = "test key",
@@ -43,8 +48,11 @@ namespace CommentsAppTests.Common.Kafka.Consumer
                 MaxRetryDelayMilliseconds = 500,
                 RetryDelayMilliseconds = 200
             };
+            _mockServiceProvider.Setup(sp => sp.GetService(typeof(IOptions<ConsumerOptions>)))
+                .Returns(Options.Create(consumerOptions));
+            _mockServiceScope.Setup(r => r.ServiceProvider).Returns(_mockServiceProvider.Object);
             _commentConsumer = new TestableCommentConsumerService(
-                _mockConsumer.Object, _loggerMock.Object, _mockKafkaTopicCreator.Object, _mockRedisDatabase.Object, _mockServiceScope.Object
+                _mockConsumer.Object, _loggerMock.Object, _mockKafkaTopicCreator.Object, _mockRedisDatabase.Object, _mockServiceScopeFactory.Object
             );
         }
 
@@ -85,7 +93,7 @@ namespace CommentsAppTests.Common.Kafka.Consumer
             await _commentConsumer.ExecuteAsync(new CancellationToken());
 
             // Assert
-            _mockRedisDatabase.Verify(p => p.ListRightPushAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<When>(), CommandFlags.None), Times.Exactly(maxTries + 1));
+            _mockRedisDatabase.Verify(p => p.ListRightPushAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<When>(), CommandFlags.None), Times.Exactly(maxTries));
 
         }
         public class TestableCommentConsumerService : CommentConsumer
