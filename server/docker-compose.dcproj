@@ -15,6 +15,7 @@
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="jmx_prometheus_javaagent-0.18.0.jar" />
     <None Include="jmx_prometheus_javaagent-0.20.0.jar" />
     <None Include="jmx_prometheus_javaagent-1.0.1.jar" />
     <None Include="kafka_jmx_config.yml" />
