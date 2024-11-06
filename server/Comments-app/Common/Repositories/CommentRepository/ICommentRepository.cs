@@ -7,7 +7,7 @@ namespace CommentApp.Common.Repositories.CommentRepository
         Task<Comment?> GetCommentByIdAsync(int id);
         Task<IEnumerable<Comment>> GetCommentsByUserIdAsync(int userId);
         Task<int> GetLastAddedCommentForUser(string email);
-        IQueryable<Comment> GetAllParrentCommentsQuery();
+        IQueryable<Comment> GetAllParentCommentsQuery();
         Task CreateCommentBatchAsync(List<Comment> comments);
         Task AddCommentAsync(Comment comment);
         Task<List<Comment>> GetAllCommentsAsync();

@@ -68,7 +68,7 @@ namespace CommentsAppTests.Common.Controllers
                 foreach (var error in expectedErrors)
                 {
                     Assert.That(modelState.ContainsKey(error.Key), $"ModelState should contain error for '{error.Key}'");
-                    Assert.That(modelState[error.Key].Errors.Count, Is.EqualTo(1));
+                    Assert.That(modelState[error.Key].Errors, Has.Count.EqualTo(1));
                     Assert.That(modelState[error.Key].Errors[0].ErrorMessage, Is.EqualTo(error.Value));
                 }
             });

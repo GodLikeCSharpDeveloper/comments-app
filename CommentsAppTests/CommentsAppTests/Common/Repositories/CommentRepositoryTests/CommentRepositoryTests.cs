@@ -206,7 +206,7 @@ namespace CommentsAppTests.Common.Repositories.CommentRepositoryTests
             // Act
             await commentRepository.CreateCommentBatchAsync(comments);
             await commentRepository.SaveChangesAsync();
-            var result = commentRepository.GetAllParrentCommentsQuery();
+            var result = commentRepository.GetAllParentCommentsQuery();
 
             // Assert
             Assert.That(result, Is.InstanceOf<IQueryable<Comment>>());

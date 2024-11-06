@@ -33,7 +33,7 @@ builder.Services.AddBackgroundServices();
 
 builder.Services.ConfigureKestrelServer(builder.Configuration, builder.WebHost);
 
-await builder.Services.AddAmazonS3(builder.Configuration);
+builder.Services.AddAmazonS3(builder.Configuration);
 
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

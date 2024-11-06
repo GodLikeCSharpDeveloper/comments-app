@@ -27,7 +27,7 @@ namespace CommentApp.Common.Kafka.TopicCreator
 
                 try
                 {
-                    await adminClient.CreateTopicsAsync(new[] { topicSpecification });
+                    await adminClient.CreateTopicsAsync([topicSpecification]);
                     logger.LogInformation($"Topic '{topic.TopicName}' was created with {topic.ParticionsCount} partitions.");
                 }
                 catch (CreateTopicsException e)

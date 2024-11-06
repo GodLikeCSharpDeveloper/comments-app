@@ -4,6 +4,7 @@ using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Services.UserService;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace CommentApp.Common.Services.CommentService
@@ -28,23 +29,34 @@ namespace CommentApp.Common.Services.CommentService
         }
         public async Task<List<Comment>> GetCommentsByQueryAsync(CommentQueryParameters queryParameters)
         {
-            var query = commentRepository.GetAllParrentCommentsQuery();
-            var validSortProperties = new[] { "User.UserName", "User.Email" };
-            foreach (var property in validSortProperties)
-            {
-                if (property.Contains(queryParameters.SortBy, StringComparison.InvariantCultureIgnoreCase))
-                    queryParameters.SortBy = property;
-            }
-            if (queryParameters.SortBy == "undefined")
-                queryParameters.SortBy = "User.UserName";
-            var sortDirection = queryParameters.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
-            query = query.OrderBy($"{queryParameters.SortBy} {sortDirection}");
-            query = query.Skip((queryParameters.PageNumber) * queryParameters.PageSize).Take(queryParameters.PageSize);
+            ArgumentNullException.ThrowIfNull(queryParameters);
+            queryParameters.SortBy = ValidateSortProperties(queryParameters.SortBy);
+            string sortDirection = string.Equals(queryParameters.SortDirection, "desc", StringComparison.InvariantCultureIgnoreCase) ? "desc" : "asc";
+            var query = commentRepository.GetAllParentCommentsQuery()
+                                         .AsNoTracking()
+                                         .OrderBy($"{queryParameters.SortBy} {sortDirection}")
+                                         .Skip(queryParameters.PageNumber * queryParameters.PageSize)
+                                         .Take(queryParameters.PageSize);
             return await query.ToListAsync();
+        }
+        private string ValidateSortProperties(string parameterSortBy)
+        {
+            var validSortProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                { "UserName", "User.UserName" },
+                { "Email", "User.Email" }
+            };
+            string sortBy = "User.UserName";
+            if (!string.IsNullOrWhiteSpace(parameterSortBy) &&
+                validSortProperties.TryGetValue(parameterSortBy, out var mappedSortBy))
+            {
+                sortBy = mappedSortBy;
+            }
+            return sortBy;
         }
         public async Task<int> CountAllComments()
         {
-            return await commentRepository.GetAllParrentCommentsQuery().CountAsync();
+            return await commentRepository.GetAllParentCommentsQuery().CountAsync();
         }
         public async Task CreateCommentAsync(Comment comment)
         {

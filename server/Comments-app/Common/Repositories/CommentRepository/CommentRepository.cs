@@ -54,7 +54,7 @@ namespace CommentApp.Common.Repositories.CommentRepository
             }
         }
 
-        public IQueryable<Comment> GetAllParrentCommentsQuery()
+        public IQueryable<Comment> GetAllParentCommentsQuery()
         {
             return dbContext.Comments.Include(c => c.User).Where(p => p.ParentCommentId == null).AsNoTracking();
         }

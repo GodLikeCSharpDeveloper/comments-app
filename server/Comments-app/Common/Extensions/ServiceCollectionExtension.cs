@@ -78,7 +78,7 @@ namespace CommentApp.Common.Extensions
 
             return services;
         }
-        public static async Task<IServiceCollection> AddAmazonS3(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddAmazonS3(this IServiceCollection services, IConfiguration configuration)
         {
             var awsOptions = configuration.GetSection("S3AWS").Get<S3AWSOptions>();
             services.AddSingleton<IAmazonS3>(provider =>
