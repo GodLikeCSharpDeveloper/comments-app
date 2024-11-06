@@ -74,6 +74,49 @@ Comments Page (/comments): Allows adding comments or replying, with image and te
 Ensure Connectivity:
 
 The UI communicates with the server at http://localhost:8080.
+
+2.4 Running NUnit Tests
+
+Option 1: Using the Command Line
+
+Navigate to the Tests Directory:
+
+bash
+cd comments-app/server/Tests
+ 
+
+Restore Dependencies:
+
+bash
+dotnet restore
+
+
+2.5 Run the Tests:
+
+bash
+dotnet test
+
+
+This will execute all NUnit tests for the server application.
+
+Option 2: Using Visual Studio
+
+Open the Solution:
+
+Open the `CommentsApp.sln` file located in `comments-app/server` using Visual Studio.
+
+Locate the Test Project:
+
+In the Solution Explorer, find the test project, for example, `CommentsApp.Tests`.
+
+Run the Tests:
+
+Open Test Explorer by navigating to `Test > Test Explorer` in the top menu.
+Click on Run All to execute all NUnit tests.
+
+This allows you to run and debug NUnit tests directly within the Visual Studio environment.
+
+
 3. Running the Load Tester
 Navigate to the Load Tester directory:
 
@@ -143,6 +186,7 @@ Custom Load Tester application
 Grafana
 Prometheus
 7. Notes
+
 Ensure all necessary configurations, such as AWS credentials and Kafka settings, are correctly set before running the applications.
 The Load Tester is designed for stress testing; use it responsibly to avoid unintended consequences.
 The application is designed to be modular; you can run the server and UI separately if needed.
