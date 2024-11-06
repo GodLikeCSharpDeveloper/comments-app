@@ -24,7 +24,7 @@ namespace LoadTester
     {
         private static readonly int TotalRequests = 10;
         private static readonly int ConcurrentRequests = 10;
-        private static readonly string Url = "https://comments-app:8081/comments/post";
+        private static readonly string Url = "http://comments-app:8080/comments/post";
 
         private static readonly HttpClient httpClient = CreateHttpClient();
 

@@ -38,6 +38,7 @@ await builder.Services.AddAmazonS3(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
+app.UseCors("AllowAll");
 
 if (app.Environment.IsDevelopment())
 {
@@ -45,8 +46,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseCors("AllowAll");
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<CommentsAppDbContext>();

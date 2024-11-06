@@ -41,7 +41,7 @@ Copy code
 docker-compose up
 Access the server:
 
-The server will be running at http://localhost:8081.
+The server will be running at http://localhost:8080.
 Option 2: Running via Visual Studio
 Open the solution:
 
@@ -73,7 +73,7 @@ Home Page (/home): Features a table with sorting and pagination.
 Comments Page (/comments): Allows adding comments or replying, with image and text uploads.
 Ensure Connectivity:
 
-The UI communicates with the server at http://localhost:8081.
+The UI communicates with the server at http://localhost:8080.
 3. Running the Load Tester
 Navigate to the Load Tester directory:
 

@@ -24,7 +24,7 @@ services:
       dockerfile: Comments-app/Dockerfile
     ports: 
       - "8080:8080"
-      - "8081:8081"
+
     depends_on:
       - comments-app-db
       - kafka
@@ -34,7 +34,6 @@ services:
       - DB_NAME=CommentsApp
       - DB_SA_PASSWORD=password@123
       - KAFKA_HOST=kafka:9092
-
     networks:
       - shared-network 
 
@@ -48,6 +47,7 @@ services:
     networks:
       - shared-network
     restart: always
+
   kafka:
     container_name: kafka
     image: bitnami/kafka:latest
@@ -68,6 +68,7 @@ services:
     networks:
       - shared-network
     restart: always
+
   redis:
     image: redis:latest
     container_name: redis-server
@@ -83,6 +84,7 @@ networks:
   shared-network:
     name: shared-network
     external: false
+
 volumes:
   redis-data:
     driver: local
