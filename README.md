@@ -186,7 +186,7 @@ Custom Load Tester application
 Grafana
 Prometheus
 7. Notes
-
+Db schema is located at comments-app\server\dbModel.mwb
 Ensure all necessary configurations, such as AWS credentials and Kafka settings, are correctly set before running the applications.
 The Load Tester is designed for stress testing; use it responsibly to avoid unintended consequences.
 The application is designed to be modular; you can run the server and UI separately if needed.

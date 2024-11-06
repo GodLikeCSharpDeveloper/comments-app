@@ -1,0 +1,13 @@
+version: "2"
+
+authtoken: 2oRoZqsVplOgyXBvwq7Tyx0cRYB_Wu47sCD3wVxKZPsV8mAW
+
+tunnels:
+  app4200:
+    proto: http
+    addr: 4200
+    inspect: false 
+  app8080:
+    proto: http
+    addr: 8080
+    inspect: false
