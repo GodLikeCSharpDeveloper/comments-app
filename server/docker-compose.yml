@@ -60,10 +60,10 @@ services:
       - KAFKA_LISTENERS=PLAINTEXT://:9092
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
       - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_OPTS=-javaagent:/usr/bin/jmx_prometheus_javaagent-0.20.0.jar=7071:/etc/kafka/kafka_jmx_config.yml
+      - KAFKA_OPTS=-javaagent:/usr/bin/jmx_prometheus_javaagent-0.18.0.jar=7071:/etc/kafka/kafka_jmx_config.yml
       - KAFKA_JMX_OPTS=-Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=prod-kafka-001 -Djava.net.preferIPv4Stack=true
     volumes:
-      - ./jmx_prometheus_javaagent-0.20.0.jar:/usr/bin/jmx_prometheus_javaagent-0.20.0.jar
+      - ./jmx_prometheus_javaagent-0.18.0.jar:/usr/bin/jmx_prometheus_javaagent-0.18.0.jar
       - ./kafka_jmx_config.yml:/etc/kafka/kafka_jmx_config.yml
     networks:
       - shared-network
