@@ -37,8 +37,7 @@ builder.Services.AddAmazonS3(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
-app.UseCors("AllowAll");
-
+app.UseCors();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

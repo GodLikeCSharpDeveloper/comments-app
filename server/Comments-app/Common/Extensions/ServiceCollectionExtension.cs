@@ -166,7 +166,7 @@ namespace CommentApp.Common.Extensions
                 });
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder =>
+                options.AddDefaultPolicy(builder =>
                 {
                     builder.AllowAnyOrigin()
                            .AllowAnyMethod()
