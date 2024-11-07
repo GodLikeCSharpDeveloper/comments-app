@@ -62,6 +62,7 @@ namespace CommentApp.Common.Repositories.CommentRepository
             return await dbContext.Comments
                 .Where(c => c.UserId == userId)
                 .Include(c => c.Replies)
+                .AsNoTracking()
                 .ToListAsync();
         }
         public async Task CreateCommentBatchAsync(List<Comment> comments)

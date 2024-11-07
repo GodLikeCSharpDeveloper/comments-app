@@ -2,13 +2,12 @@
 {
     public class GetCommentDto
     {
+        public int Id { get; set; }
         public string Text { get; set; }
-        public string Captcha { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string? HomePage { get; set; }
-        public IFormFile? Image { get; set; }
-        public IFormFile? TextFile { get; set; }
-        public int? ParentCommentId { get; set; }
+        public GetUserDto User { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? TextFileUrl { get; set; }
+        public List<GetCommentDto>? Replies { get; set; }
     }
 }

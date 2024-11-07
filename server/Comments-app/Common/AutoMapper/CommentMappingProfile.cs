@@ -21,6 +21,12 @@ public class CommentMappingProfile : Profile
          .ForMember(dest => dest.Replies, opt => opt.Ignore())
          .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())
          .ForMember(dest => dest.TextFileUrl, opt => opt.Ignore());
+        CreateMap<User, GetUserDto>();
+        CreateMap<Comment, GetCommentDto>()
+            .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+            .ForMember(dest => dest.Replies, opt => opt.MapFrom(src => src.Replies))
+            .MaxDepth(5)
+            .PreserveReferences();
     }
     private static int? ParseParentCommentId(string parentCommentId)
     {

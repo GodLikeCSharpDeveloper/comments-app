@@ -1,4 +1,6 @@
-﻿using CommentApp.Common.Models;
+﻿using CommentApp.Common.AutoMapper;
+using CommentApp.Common.Models;
+using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Services.CommentService;
@@ -14,6 +16,7 @@ namespace CommentsAppTests.Common.Services.CommentServiceTests
         private Mock<IUserService> mockUserService;
         private Mock<IRedisUserCacheService> mockCacheService;
         private CommentService commentService;
+        private Mock<IAutoMapperService> mockAutoMapperService;
 
         [SetUp]
         public void Setup()
@@ -21,7 +24,8 @@ namespace CommentsAppTests.Common.Services.CommentServiceTests
             mockCommentRepository = new Mock<ICommentRepository>();
             mockUserService = new Mock<IUserService>();
             mockCacheService = new Mock<IRedisUserCacheService>();
-            commentService = new CommentService(mockCommentRepository.Object, mockUserService.Object, mockCacheService.Object);
+            mockAutoMapperService = new Mock<IAutoMapperService>();
+            commentService = new CommentService(mockCommentRepository.Object, mockUserService.Object, mockCacheService.Object, mockAutoMapperService.Object);
         }
 
         [Test]
@@ -29,16 +33,17 @@ namespace CommentsAppTests.Common.Services.CommentServiceTests
         {
             // Arrange
             var expectedComment = new Comment { Text = "Test comment" };
+            var resultComment = new GetCommentDto { Text = "Test comment" };
             mockCommentRepository
                 .Setup(repo => repo.GetCommentByIdAsync(1))
                 .ReturnsAsync(expectedComment);
-
+            mockAutoMapperService.Setup(d => d.Map<Comment, GetCommentDto>(expectedComment)).Returns(resultComment);
             // Act
             var result = await commentService.GetCommentByIdAsync(1);
 
             // Assert
             Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.EqualTo(expectedComment));
+            Assert.That(result, Is.EqualTo(resultComment));
             mockCommentRepository.Verify(repo => repo.GetCommentByIdAsync(1), Times.Once);
         }
 
@@ -67,16 +72,21 @@ namespace CommentsAppTests.Common.Services.CommentServiceTests
                 new Comment { Text = "Comment1" },
                 new Comment { Text = "Comment2" }
             };
+            var getComments = new List<GetCommentDto>
+            {
+                new GetCommentDto { Text = "Comment1" },
+                new GetCommentDto { Text = "Comment2" }
+            };
             mockCommentRepository.Setup(repo => repo.GetAllCommentsAsync())
                 .ReturnsAsync(comments);
-
+            mockAutoMapperService.Setup(d => d.Map<Comment, GetCommentDto>(comments)).Returns(getComments);
             // Act
             var result = await commentService.GetAllCommentsAsync();
 
             // Assert
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Count, Is.EqualTo(2));
-            Assert.That(result, Is.EqualTo(comments));
+            Assert.That(result, Is.EqualTo(getComments));
             mockCommentRepository.Verify(repo => repo.GetAllCommentsAsync(), Times.Once);
         }
 

@@ -197,7 +197,7 @@ namespace CommentsAppTests.Common.Controllers
         {
             // Arrange
             var queryParameters = new CommentQueryParameters();
-            var expectedResponse = new List<Comment> { new Comment { Text = "Test Comment" } };
+            var expectedResponse = new List<GetCommentDto> { new GetCommentDto { Text = "Test Comment" } };
             _commentServiceMock.Setup(s => s.GetCommentsByQueryAsync(queryParameters))
                 .ReturnsAsync(expectedResponse);
 
@@ -214,7 +214,7 @@ namespace CommentsAppTests.Common.Controllers
         public async Task GetAllComments_ReturnsOkWithAllComments()
         {
             // Arrange
-            var expectedResponse = new List<Comment> { new() { Text = "Test Comment" } };
+            var expectedResponse = new List<GetCommentDto> { new() { Text = "Test Comment" } };
             _commentServiceMock.Setup(s => s.GetAllCommentsAsync())
                 .ReturnsAsync(expectedResponse);
 
