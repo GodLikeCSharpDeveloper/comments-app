@@ -1,6 +1,4 @@
-﻿using CommentApp.Common.Models.Options;
-
-namespace CommentApp.Common.Kafka.TopicCreator
+﻿namespace CommentApp.Common.Kafka.TopicCreator
 {
     public interface IKafkaTopicCreator
     {

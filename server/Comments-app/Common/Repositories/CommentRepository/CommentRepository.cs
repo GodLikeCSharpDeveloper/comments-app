@@ -1,6 +1,5 @@
 ﻿using CommentApp.Common.Data;
 using CommentApp.Common.Models;
-using CommentApp.Common.Models.DTOs;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 

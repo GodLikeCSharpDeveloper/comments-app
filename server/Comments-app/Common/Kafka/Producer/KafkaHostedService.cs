@@ -1,9 +1,6 @@
 ﻿using CommentApp.Common.Kafka.Producer;
 using Confluent.Kafka;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 
 public class KafkaHostedService(IProducer<Null, string> producer, ILogger<KafkaHostedService> logger, IKafkaQueueService kafkaQueueService) : BackgroundService
 {

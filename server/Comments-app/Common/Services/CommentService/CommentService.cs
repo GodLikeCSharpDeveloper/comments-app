@@ -4,7 +4,6 @@ using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Services.UserService;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Dynamic.Core;
 
 namespace CommentApp.Common.Services.CommentService

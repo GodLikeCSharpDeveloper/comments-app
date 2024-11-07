@@ -1,18 +1,12 @@
 ﻿using CommentApp.Common.Models;
-using CommentApp.Common.Models.Options;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Services.CommentService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NUnit.Framework;
 using StackExchange.Redis;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Redis
 {

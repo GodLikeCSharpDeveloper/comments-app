@@ -1,20 +1,12 @@
 ﻿using CommentApp.Common.Kafka.Consumer;
 using CommentApp.Common.Kafka.TopicCreator;
-using CommentApp.Common.Models;
 using CommentApp.Common.Models.Options;
-using CommentApp.Common.Redis;
-using CommentApp.Common.Services.CommentService;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Kafka.Consumer
 {

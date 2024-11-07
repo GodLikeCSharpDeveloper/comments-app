@@ -1,17 +1,14 @@
-﻿using Amazon.S3.Model;
-using Amazon.S3;
-using AutoMapper;
-using CommentApp.Common.AutoMapper;
+﻿using CommentApp.Common.AutoMapper;
 using CommentApp.Common.Kafka.Producer;
 using CommentApp.Common.Models;
 using CommentApp.Common.Models.DTOs;
+using CommentApp.Common.Services.CaptchaService;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
+using CommentApp.Common.Services.FileService.FileProcessingService;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using CommentApp.Common.Services.CaptchaService;
-using CommentApp.Common.Services.FileService.FileProcessingService;
 
 namespace CommentApp.Common.Controllers
 {

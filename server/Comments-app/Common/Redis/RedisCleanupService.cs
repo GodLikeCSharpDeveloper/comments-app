@@ -1,15 +1,14 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
-using StackExchange.Redis;
-
-public class RedisCleanupService(IConnectionMultiplexer redis)
+﻿using StackExchange.Redis;
+namespace CommentApp.Common.Redis
 {
-    private readonly IConnectionMultiplexer _redis = redis;
-
-    public async Task StopAsync()
+    public class RedisCleanupService(IConnectionMultiplexer redis)
     {
-        var db = _redis.GetDatabase();
-        await db.ExecuteAsync("FLUSHDB");
+        private readonly IConnectionMultiplexer _redis = redis;
+
+        public async Task StopAsync()
+        {
+            var db = _redis.GetDatabase();
+            await db.ExecuteAsync("FLUSHDB");
+        }
     }
 }

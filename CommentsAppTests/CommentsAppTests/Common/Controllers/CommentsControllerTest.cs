@@ -1,20 +1,17 @@
-﻿using NUnit.Framework;
-using Moq;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Confluent.Kafka;
+﻿using CommentApp.Common.AutoMapper;
 using CommentApp.Common.Controllers;
 using CommentApp.Common.Kafka.Producer;
-using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Models;
-using Microsoft.AspNetCore.Http;
-using CommentApp.Common.Services.FileService;
-using CommentApp.Common.AutoMapper;
-using CommentApp.Common.Services.CommentService;
+using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Services.CaptchaService;
+using CommentApp.Common.Services.CommentService;
+using CommentApp.Common.Services.FileService;
 using CommentApp.Common.Services.FileService.FileProcessingService;
+using Confluent.Kafka;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 namespace CommentsAppTests.Common.Controllers
 {
     [TestFixture]

@@ -2,15 +2,8 @@
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
-using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.UserService;
-using Microsoft.EntityFrameworkCore;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Services.UserServiceTests
 {

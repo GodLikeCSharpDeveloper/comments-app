@@ -1,6 +1,4 @@
-﻿using Azure;
-using CommentApp.Common.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using CommentApp.Common.Models;
 using Newtonsoft.Json;
 
 

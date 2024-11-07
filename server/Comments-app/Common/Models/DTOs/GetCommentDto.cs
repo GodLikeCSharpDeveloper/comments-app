@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CommentApp.Common.Models.DTOs
+﻿namespace CommentApp.Common.Models.DTOs
 {
     public class GetCommentDto
     {

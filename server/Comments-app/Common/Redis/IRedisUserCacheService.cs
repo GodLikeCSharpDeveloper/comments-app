@@ -1,5 +1,4 @@
 ﻿using CommentApp.Common.Models;
-using Newtonsoft.Json;
 
 namespace CommentApp.Common.Redis
 {

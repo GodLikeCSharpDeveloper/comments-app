@@ -6,7 +6,6 @@ using CommentApp.Common.Data;
 using CommentApp.Common.Kafka.Consumer;
 using CommentApp.Common.Kafka.Producer;
 using CommentApp.Common.Kafka.TopicCreator;
-using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Models.Options;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
@@ -15,12 +14,9 @@ using CommentApp.Common.Services.CaptchaService;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.FileService;
 using CommentApp.Common.Services.FileService.FileProcessingService;
-using CommentApp.Common.Services.SecretService;
 using CommentApp.Common.Services.UserService;
 using Confluent.Kafka;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
 namespace CommentApp.Common.Extensions
@@ -192,7 +188,7 @@ namespace CommentApp.Common.Extensions
         public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<CommentsAppDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), sqlOptions => 
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
                     sqlOptions.EnableRetryOnFailure(
                     maxRetryCount: 4,
                     maxRetryDelay: TimeSpan.FromSeconds(2),

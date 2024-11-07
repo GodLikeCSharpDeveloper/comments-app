@@ -1,7 +1,6 @@
 ﻿using CommentApp.Common.Kafka.TopicCreator;
 using CommentApp.Common.Models.Options;
 using Confluent.Kafka;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 

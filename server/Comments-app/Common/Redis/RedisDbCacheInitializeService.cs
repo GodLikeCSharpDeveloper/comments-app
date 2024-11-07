@@ -1,10 +1,5 @@
 ﻿using CommentApp.Common.Models;
-using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.UserService;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using StackExchange.Redis;
-using System.Threading;
 
 namespace CommentApp.Common.Redis
 {

@@ -2,7 +2,6 @@
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
-using CommentApp.Common.Services.CommentService;
 
 namespace CommentApp.Common.Services.UserService
 {

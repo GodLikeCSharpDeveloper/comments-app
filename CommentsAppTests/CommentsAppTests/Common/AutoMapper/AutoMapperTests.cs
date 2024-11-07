@@ -1,20 +1,9 @@
 ﻿using AutoMapper;
-using CommentApp.Common.Controllers;
-using CommentApp.Common.Kafka.Producer;
-using CommentApp.Common.Models.DTOs;
-using CommentApp.Common.Models;
-using CommentApp.Common.Services.FileService;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using CommentApp.Common.AutoMapper;
+using CommentApp.Common.Models;
+using CommentApp.Common.Models.DTOs;
+using Microsoft.AspNetCore.Http;
+using Moq;
 
 namespace CommentsAppTests.Common.AutoMapper
 {

@@ -1,5 +1,4 @@
 ﻿using CommentApp.Common.Models;
-using Polly;
 
 namespace CommentApp.Common.Repositories.UserRepository
 {

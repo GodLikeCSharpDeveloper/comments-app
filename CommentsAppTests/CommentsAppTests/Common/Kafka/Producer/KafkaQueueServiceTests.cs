@@ -1,10 +1,4 @@
-﻿using NUnit.Framework;
-using Moq;
-using System.Threading.Tasks;
-using System.Threading;
-using System;
-using Confluent.Kafka;
-using System.Threading.Channels;
+﻿using Confluent.Kafka;
 
 namespace CommentsAppTests.Common.Kafka.Producer
 {

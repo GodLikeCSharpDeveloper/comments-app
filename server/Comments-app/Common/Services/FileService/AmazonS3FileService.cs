@@ -1,14 +1,9 @@
-﻿using Amazon.Auth.AccessControlPolicy;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using CommentApp.Common.Services.FileService;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Polly;
 using Polly.Retry;
-using System;
 using System.Net;
-using System.Threading.Tasks;
 using Policy = Polly.Policy;
 
 public class AmazonS3FileService(IAmazonS3 amazonS3Client, ILogger<AmazonS3FileService> logger) : IFileService

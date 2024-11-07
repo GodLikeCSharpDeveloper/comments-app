@@ -1,15 +1,9 @@
 ﻿using CommentApp.Common.Models;
-using CommentApp.Common.Models.DTOs;
 using CommentApp.Common.Redis;
 using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Services.CommentService;
 using CommentApp.Common.Services.UserService;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Services.CommentServiceTests
 {
@@ -174,7 +168,8 @@ namespace CommentsAppTests.Common.Services.CommentServiceTests
             var convertedUsers = new List<User> { user };
             mockUserService.Setup(service => service.CreateOrUpdateUserBatchAsync(It.IsAny<List<User>>()))
                 .Returns(Task.CompletedTask)
-                .Callback<List<User>>(u => {
+                .Callback<List<User>>(u =>
+                {
                     foreach (var usr in u)
                     {
                         usr.Id = 1; // Simulate assigning an ID after creation

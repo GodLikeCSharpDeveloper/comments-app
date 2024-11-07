@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using System.Threading;
-using System.Threading.Tasks;
-
-public class QueuedHostedService(IBackgroundTaskQueue taskQueue, ILogger<QueuedHostedService> logger) : BackgroundService
+﻿public class QueuedHostedService(IBackgroundTaskQueue taskQueue, ILogger<QueuedHostedService> logger) : BackgroundService
 {
     private readonly ILogger<QueuedHostedService> logger = logger;
     private readonly IBackgroundTaskQueue taskQueue = taskQueue;

@@ -2,7 +2,6 @@
 using CommentApp.Common.Models;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
-using Polly;
 
 namespace CommentApp.Common.Repositories.UserRepository
 {

@@ -1,15 +1,8 @@
 ﻿using CommentApp.Common.Data;
 using CommentApp.Common.Models;
-using CommentApp.Common.Repositories.CommentRepository;
 using CommentApp.Common.Repositories.UserRepository;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using SQLitePCL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
 {
@@ -31,7 +24,7 @@ namespace CommentsAppTests.Common.Repositories.UserRepositoryTests
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
             dbContext.Database.OpenConnection();
-            userRepository = new UserRepository(dbContext); 
+            userRepository = new UserRepository(dbContext);
         }
 
         [TearDown]

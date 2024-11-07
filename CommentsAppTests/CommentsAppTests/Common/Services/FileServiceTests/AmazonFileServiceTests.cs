@@ -1,21 +1,10 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
-using CommentApp.Common.AutoMapper;
-using CommentApp.Common.Controllers;
-using CommentApp.Common.Kafka.Producer;
-using CommentApp.Common.Models.DTOs;
-using CommentApp.Common.Services.FileService;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CommentsAppTests.Common.Services.FileServiceTests
 {

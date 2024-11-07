@@ -1,5 +1,4 @@
 ﻿using CommentApp.Common.Models;
-using CommentApp.Common.Models.Options;
 using CommentApp.Common.Services.CommentService;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
